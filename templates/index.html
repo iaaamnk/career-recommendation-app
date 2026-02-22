@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Compass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-compass"></i></div>
+                <span>CareerCompass<span class="text-primary">AI</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}" class="active">Home</a>
+                <a href="#features">Features</a>
+                <a href="{{ url_for('how_it_works') }}">How it Works</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-container">
+            <div class="hero-text">
+                <div class="badge">AI-Powered Guidance</div>
+                <h1>Discover Your Perfect Career Path</h1>
+                <p class="hero-subtitle">Unsure about your future? Our advanced AI analyzes your skills, interests, and
+                    personality to recommend the best career opportunities for you.</p>
+
+                <div class="trust-badges">
+                    <div class="trust-item"><i class="fas fa-check-circle"></i> 98% Accuracy</div>
+                    <div class="trust-item"><i class="fas fa-user-shield"></i> 100% Private</div>
+                </div>
+
+                <div class="hero-features">
+                    <div class="hf-item">
+                        <div class="hf-icon"><i class="fas fa-brain"></i></div>
+                        <div class="hf-text">
+                            <strong>AI Personality Analysis</strong>
+                            <p>Deep psychological profiling with RIASEC model</p>
+                        </div>
+                    </div>
+                    <div class="hf-item">
+                        <div class="hf-icon"><i class="fas fa-map-signs"></i></div>
+                        <div class="hf-text">
+                            <strong>Step-by-Step Roadmaps</strong>
+                            <p>Courses, skills, and certifications you need</p>
+                        </div>
+                    </div>
+                    <div class="hf-item">
+                        <div class="hf-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="hf-text">
+                            <strong>Market Data & Trends</strong>
+                            <p>Real salary ranges and future demand scores</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form Card -->
+            <div class="hero-card" id="input-card">
+                <div class="card-header">
+                    <h2>Career Discovery Engine</h2>
+                    <p>Complete your profile to get started</p>
+                </div>
+
+                <form id="career-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" min="16" max="80" required placeholder="24">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="education">Education</label>
+                            <select id="education" name="education" required>
+                                <option value="" disabled selected>Select Level</option>
+                                <option value="High School">High School</option>
+                                <option value="Bachelor's">Bachelor's Degree</option>
+                                <option value="Master's">Master's Degree</option>
+                                <option value="PhD">PhD</option>
+                                <option value="Diploma">Diploma</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="skills">Key Skills</label>
+                        <input type="text" id="skills" name="skills" required placeholder="e.g., Python, SQL, Design">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interests">Interests</label>
+                        <input type="text" id="interests" name="interests" required
+                            placeholder="e.g., Tech, Art, Finance">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="mb-2">Personality Profile (RIASEC)</label>
+                        <div class="riasec-grid">
+                            <div class="range-wrapper">
+                                <div class="range-label"><span>Realistic</span> <span id="val-r"
+                                        class="val-badge">5</span></div>
+                                <p class="riasec-desc">Do you like playing sports, tinkering with gadgets, taking care
+                                    of plants or pets, or having outdoor adventures?</p>
+                                <input type="range" id="r-score" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-r').innerText = this.value">
+                            </div>
+                            <div class="range-wrapper">
+                                <div class="range-label"><span>Investigative</span> <span id="val-i"
+                                        class="val-badge">5</span></div>
+                                <p class="riasec-desc">Do you enjoy learning cool stuff, solving mysteries, or figuring
+                                    things out with friends?</p>
+                                <input type="range" id="i-score" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-i').innerText = this.value">
+                            </div>
+                            <div class="range-wrapper">
+                                <div class="range-label"><span>Artistic</span> <span id="val-a"
+                                        class="val-badge">5</span></div>
+                                <p class="riasec-desc">Do you love making art, coming up with awesome ideas, or just
+                                    letting your imagination run wild?</p>
+                                <input type="range" id="a-score" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-a').innerText = this.value">
+                            </div>
+                            <div class="range-wrapper">
+                                <div class="range-label"><span>Social</span> <span id="val-s" class="val-badge">5</span>
+                                </div>
+                                <p class="riasec-desc">Do you enjoy sharing cool facts and helping and teaching others?
+                                </p>
+                                <input type="range" id="s-score" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-s').innerText = this.value">
+                            </div>
+                            <div class="range-wrapper">
+                                <div class="range-label"><span>Enterprising</span> <span id="val-e"
+                                        class="val-badge">5</span></div>
+                                <p class="riasec-desc">Do you like to be in charge, take the lead, and make big things
+                                    happen?</p>
+                                <input type="range" id="e-score" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-e').innerText = this.value">
+                            </div>
+                            <div class="range-wrapper">
+                                <div class="range-label"><span>Conventional</span> <span id="val-c"
+                                        class="val-badge">5</span></div>
+                                <p class="riasec-desc">Do you like working with numbers, organizing stuff , and
+                                    following steps to get things done?</p>
+                                <input type="range" id="c-score" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-c').innerText = this.value">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Analyze Profile <i class="fas fa-arrow-right"></i></button>
+                </form>
+
+                <div class="loader" id="loader">
+                    <div class="spinner"></div>
+                    <p>Analyzing your profile...</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Results Section -->
+    <section id="result-section" class="results-section">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Your Career Analysis</h2>
+                <p>Based on your unique profile and preferences</p>
+            </div>
+
+            <div class="results-card">
+                <div class="results-grid">
+                    <!-- Main Recommendation -->
+                    <div class="main-rec">
+                        <div class="rec-header">
+                            <span class="match-badge" id="rec-score">98% AccurateMatch</span>
+                            <h3 id="rec-career">Data Scientist</h3>
+                        </div>
+                        <div class="rec-body">
+                            <h4>Why this career?</h4>
+                            <p id="rec-explanation">Based on your strong analytical skills and investigative nature...
+                            </p>
+
+                            <div class="roadmap-box">
+                                <h4><i class="fas fa-map-signs"></i> Your Roadmap</h4>
+                                <div class="roadmap-item">
+                                    <span class="rm-label">Skills</span>
+                                    <span class="rm-value" id="rm-skills">Python, SQL, ML</span>
+                                </div>
+                                <div class="roadmap-item">
+                                    <span class="rm-label">Courses</span>
+                                    <span class="rm-value" id="rm-courses">Coursera ML, Fast.ai</span>
+                                </div>
+                                <div class="roadmap-item">
+                                    <span class="rm-label">Certs</span>
+                                    <span class="rm-value" id="rm-certs">AWS ML Specialty</span>
+                                </div>
+                                <div class="roadmap-item">
+                                    <span class="rm-label">Salary (IN)</span>
+                                    <span class="rm-value" id="rm-salary">₹10L - ₹30L</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alternatives -->
+                    <div class="alternatives-box">
+                        <h4>Alternative Paths</h4>
+                        <div class="alternatives-list" id="alt-list">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="alt-info">
+                            <p><i class="fas fa-info-circle"></i> These careers also align well with your profile but
+                                may require slightly different focus areas.</p>
+                        </div>
+                        <button onclick="location.reload()" class="btn btn-outline btn-sm mt-4">Analyze Another
+                            Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Why Choose CareerCompass?</h2>
+                <p>We use data-driven insights to guide your future</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <h3>AI Analysis</h3>
+                    <p>Our model is trained on thousands of successful career profiles to find patterns that match
+                        yours.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-road"></i></div>
+                    <h3>Clear Roadmaps</h3>
+                    <p>Don't just get a job title. Get a step-by-step guide on skills, courses, and certifications.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Market Insights</h3>
+                    <p>Stay ahead with up-to-date salary ranges and future demand predictions for every role.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h4>CareerCompassAI</h4>
+                    <p>Guiding your professional journey with intelligence.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CareerCompassAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

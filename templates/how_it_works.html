@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - AI Career Compass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #f0f2f5;
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            z-index: 0;
+        }
+
+        .step-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .why-works-box {
+            background: #2c3e50;
+            color: white;
+            border-radius: 12px;
+            padding: 3rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .why-works-box h3 {
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}"
+                    style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                    <div class="logo-icon"><i class="fas fa-compass"></i></div>
+                    <span>CareerCompass<span class="text-primary">AI</span></span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('home') }}#features">Features</a>
+                <a href="{{ url_for('how_it_works') }}" class="active">How it Works</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>How It Works</h1>
+            <p style="max-width: 600px; margin: 0 auto; color: #555;">
+                Our career recommendation system uses a hybrid AI approach to suggest careers that match a user’s
+                skills, interests, and personality.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="section-padding" style="padding: 4rem 0;">
+        <div class="container">
+
+            <!-- Step 1 -->
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-content">
+                    <h3><i class="fas fa-id-card-alt text-primary"></i> Profile Analysis</h3>
+                    <p>Users provide basic details such as age, education, skills, interests, and personality traits
+                        (RIASEC model). This information is cleaned and converted into a format that the system can
+                        understand.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-content">
+                    <h3><i class="fas fa-microchip text-primary"></i> Smart Career Prediction</h3>
+                    <p>A machine learning model (Random Forest) analyzes the user profile and predicts the most suitable
+                        career group with a confidence score. It also suggests alternative career options.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <h3><i class="fas fa-puzzle-piece text-primary"></i> Personality & Skill Matching</h3>
+                    <p>The system uses the RIASEC personality model to ensure the recommended career aligns not only
+                        with technical skills but also with the user’s natural interests and strengths.</p>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card">
+                <div class="step-number">04</div>
+                <div class="step-content">
+                    <h3><i class="fas fa-network-wired text-primary"></i> Unsupervised Career Insights</h3>
+                    <p>In addition to prediction, the system groups similar profiles using clustering. This helps
+                        identify hidden patterns and provides a supporting career suggestion for better confidence.</p>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step-card">
+                <div class="step-number">05</div>
+                <div class="step-content">
+                    <h3><i class="fas fa-road text-primary"></i> Actionable Guidance</h3>
+                    <p>Along with the recommendation, users receive a career roadmap including required skills, courses,
+                        certifications, and future growth prospects.</p>
+                </div>
+            </div>
+
+            <!-- Why This Works -->
+            <div class="why-works-box">
+                <h3><i class="fas fa-check-circle"></i> Why This Works</h3>
+                <p>By combining machine learning, personality analysis, and real-world career data, the system delivers
+                    accurate, explainable, and practical career recommendations.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h4>CareerCompassAI</h4>
+                    <p>Guiding your professional journey with intelligence.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CareerCompassAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
