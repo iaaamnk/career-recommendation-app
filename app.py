@@ -7,10 +7,12 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from flask import Flask, request, jsonify, render_template
 import warnings
+import os
 
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'change-this-before-going-to-production')
 
 # ---------------- CONFIG ----------------
 RANDOM_SEED = 42
@@ -364,4 +366,5 @@ def predict():
 
 if __name__ == "__main__":
     load_and_train_model()
-    app.run(debug=True, port=5000)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(debug=debug_mode, port=5000)

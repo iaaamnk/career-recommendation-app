@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables (NEVER commit this)
+.env
+*.env
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Utility/debug scripts (not part of the app)
+fix_css.py
+fix_js.py
+reproduce_issue.py
+
+# Flask session
+flask_session/
+
+# OS files
+.DS_Store
+Thumbs.db
