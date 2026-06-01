@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+scikit-learn
+pandas
+numpy
+firebase-admin
+pydantic
+python-multipart
+spacy
+nltk
+python-dotenv
