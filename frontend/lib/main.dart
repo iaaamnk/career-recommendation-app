@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const ProviderScope(child: PathFinderApp()));
@@ -104,6 +105,10 @@ class _MainLayoutState extends State<MainLayout> {
             onPressed: () => setState(() => currentView = 'resume'),
             child: const Text('ATS Check'),
           ),
+          TextButton(
+            onPressed: () => setState(() => currentView = 'profile'),
+            child: const Text('Profile'),
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -111,7 +116,9 @@ class _MainLayoutState extends State<MainLayout> {
           ? const DashboardView() 
           : currentView == 'assessment' 
               ? const AssessmentView() 
-              : const ResumeAnalysisView(),
+              : currentView == 'resume'
+                  ? const ResumeAnalysisView()
+                  : const ProfileView(),
     );
   }
 }
@@ -127,8 +134,7 @@ class DashboardView extends ConsumerWidget {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 900),
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
             Text('Welcome back, User', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 8),
@@ -146,26 +152,30 @@ class DashboardView extends ConsumerWidget {
             const SizedBox(height: 32),
             Text('Recent Activity', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            Expanded(
-              child: dashboardData.recentActivity.isEmpty
-                  ? Center(child: Text("No recent activity.", style: TextStyle(color: Colors.grey[600])))
-                  : ListView.builder(
-                      itemCount: dashboardData.recentActivity.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: ListTile(
-                            leading: const CircleAvatar(child: Icon(Icons.analytics)),
-                            title: Text(dashboardData.recentActivity[index]),
-                            subtitle: const Text('Just now'),
-                            trailing: const Icon(Icons.chevron_right),
-                            tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        );
-                      },
+            if (dashboardData.recentActivity.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32.0),
+                child: Center(child: Text("No recent activity.", style: TextStyle(color: Colors.grey[600]))),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: dashboardData.recentActivity.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: ListTile(
+                      leading: const CircleAvatar(child: Icon(Icons.analytics)),
+                      title: Text(dashboardData.recentActivity[index]),
+                      subtitle: const Text('Just now'),
+                      trailing: const Icon(Icons.chevron_right),
+                      tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-            )
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -236,7 +246,7 @@ class _AssessmentViewState extends ConsumerState<AssessmentView> {
     setState(() => isLoading = true);
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/recommend'),
+        Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/recommend'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "user_id": 1, // Mock user ID
@@ -512,7 +522,7 @@ class _ResumeAnalysisViewState extends ConsumerState<ResumeAnalysisView> {
     setState(() => isLoading = true);
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/resume/analyze'),
+        Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/resume/analyze'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "user_id": 1, // Mock user ID
@@ -631,22 +641,111 @@ class _ResumeAnalysisViewState extends ConsumerState<ResumeAnalysisView> {
                                     backgroundColor: Colors.red.withOpacity(0.1),
                                     side: const BorderSide(color: Colors.transparent),
                                   )).toList(),
-                                )
+                                ),
                               ],
                             ),
                           ),
                         ],
-                      )
-                    ],
+                      ),
+                        
+                        // New: Overall AI Analysis Section
+                        if (analysis['overall_analysis'] != null) ...[
+                          const SizedBox(height: 32),
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.3)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.secondary),
+                                    const SizedBox(width: 8),
+                                    Text('AI Overall Analysis', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.secondary)),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(analysis['overall_analysis'], style: const TextStyle(fontSize: 16, height: 1.5)),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        // New: Interview Prep & Roadmap
+                        if (result!['interview_prep'] != null) ...[
+                          const SizedBox(height: 32),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Icon(Icons.psychology, size: 28, color: Theme.of(context).colorScheme.primary),
+                              const SizedBox(width: 8),
+                              Text('Interview Preparation', style: Theme.of(context).textTheme.headlineSmall),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text('Tailored Questions:', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          ...(result!['interview_prep']['interview_questions'] as List).map((q) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0, left: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('• ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                Expanded(child: Text(q, style: const TextStyle(fontSize: 15))),
+                              ],
+                            ),
+                          )).toList(),
+                          
+                          const SizedBox(height: 16),
+                          Text('Pro Tips:', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          ...(result!['interview_prep']['tips'] as List).map((t) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0, left: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.lightbulb_outline, size: 16, color: Colors.amber),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(t, style: const TextStyle(fontSize: 15, fontStyle: FontStyle.italic))),
+                              ],
+                            ),
+                          )).toList(),
+                          
+                          const SizedBox(height: 32),
+                          Center(
+                            child: FilledButton.tonalIcon(
+                              onPressed: () async {
+                                final url = Uri.parse(result!['interview_prep']['roadmap_url']);
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url);
+                                } else {
+                                  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not launch roadmap URL')));
+                                }
+                              },
+                              icon: const Icon(Icons.map),
+                              label: const Text('View Career Roadmap on roadmap.sh'),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                              ),
+                            ),
+                          ),
+                        ]
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              TextButton.icon(
-                onPressed: () => setState(() => result = null),
-                icon: const Icon(Icons.refresh),
-                label: const Text('Analyze Another Resume'),
-              )
+                const SizedBox(height: 24),
+                TextButton.icon(
+                  onPressed: () => setState(() => result = null),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Analyze Another Resume'),
+                )
               ],
             ),
           ),
@@ -692,6 +791,139 @@ class _ResumeAnalysisViewState extends ConsumerState<ResumeAnalysisView> {
                 icon: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.analytics),
                 label: const Text('Scan & Score Resume'),
                 style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 20)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------- PROFILE VIEW ----------------
+class ProfileView extends StatefulWidget {
+  const ProfileView({super.key});
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  final _nameController = TextEditingController(text: 'Demo User');
+  final _emailController = TextEditingController(text: 'demo@example.com');
+  bool _isSaved = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.all(24.0),
+        child: ListView(
+          children: [
+            const Icon(Icons.person, size: 48, color: Color(0xFF6C63FF)),
+            const SizedBox(height: 16),
+            Text('Profile Creation', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+
+            // Profile Form
+            Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Your Information', style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(labelText: 'Full Name', border: OutlineInputBorder()),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(labelText: 'Email Address', border: OutlineInputBorder()),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton.icon(
+                      onPressed: () {
+                        setState(() => _isSaved = true);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved successfully!')));
+                      },
+                      icon: const Icon(Icons.save),
+                      label: const Text('Save Profile'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 48),
+
+            // Feature List
+            Text('App Features', style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            _buildFeatureItem(
+              context,
+              Icons.psychology,
+              'Career Assessment',
+              'Take a comprehensive RIASEC test along with your skills and interests to get AI-powered career recommendations.',
+            ),
+            _buildFeatureItem(
+              context,
+              Icons.document_scanner,
+              'Resume Analysis',
+              'Upload your resume text to get an ATS compatibility score and identify missing skills for your target role.',
+            ),
+            _buildFeatureItem(
+              context,
+              Icons.school,
+              'Interview Preparation',
+              'Receive tailored interview questions and pro tips based on your skill gaps to help you land the job.',
+            ),
+            _buildFeatureItem(
+              context,
+              Icons.map,
+              'Career Roadmaps',
+              'Direct integration with roadmap.sh to provide structured learning paths for your recommended careers.',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(BuildContext context, IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text(description, style: TextStyle(color: Colors.grey[700], height: 1.4)),
+                  ],
+                ),
               ),
             ],
           ),
