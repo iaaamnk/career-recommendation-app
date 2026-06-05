@@ -6,6 +6,7 @@ from typing import List, Optional
 from database import engine, get_db, Base
 import models
 import ml_model
+from auth import verify_firebase_token
 
 # Create DB tables (wrapped in try-except so it doesn't crash on boot if Hive is unavailable)
 try:
@@ -32,7 +33,6 @@ def load_ml_model():
     ml_model.load_and_train_model()
 
 class AssessmentRequest(BaseModel):
-    user_id: int
     age: int
     education: str
     skills: List[str]
@@ -44,16 +44,7 @@ def health_check():
     return {"status": "ok", "model_loaded": ml_model.rf_model is not None}
 
 @app.post("/api/recommend")
-def recommend_career(request: AssessmentRequest, db: Session = Depends(get_db)):
-    # 1. Ensure user exists
-    user = db.query(models.User).filter(models.User.id == request.user_id).first()
-    if not user:
-        # Create a mock user so the API doesn't fail for the frontend demo
-        user = models.User(id=request.user_id, email="demo@example.com", name="Demo User")
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-
+def recommend_career(request: AssessmentRequest, db: Session = Depends(get_db), user: models.User = Depends(verify_firebase_token)):
     # 2. Get predictions
     try:
         prediction = ml_model.predict_career(
@@ -90,21 +81,13 @@ def recommend_career(request: AssessmentRequest, db: Session = Depends(get_db)):
     }
 
 class ResumeAnalyzeRequest(BaseModel):
-    user_id: int
     resume_text: str
     target_career: str
 
 @app.post("/api/resume/analyze")
-def analyze_resume(request: ResumeAnalyzeRequest, db: Session = Depends(get_db)):
+def analyze_resume(request: ResumeAnalyzeRequest, db: Session = Depends(get_db), user: models.User = Depends(verify_firebase_token)):
     import nlp_model
-    user = db.query(models.User).filter(models.User.id == request.user_id).first()
-    if not user:
-        # Create a mock user so the API doesn't fail for the frontend demo
-        user = models.User(id=request.user_id, email="demo@example.com", name="Demo User")
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-        
+    
     analysis = nlp_model.analyze_resume_text(request.resume_text, request.target_career)
     interview_prep = nlp_model.generate_interview_prep(request.target_career, analysis["skills_missing"])
     

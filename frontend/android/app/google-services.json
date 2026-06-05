@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "409823234185",
+    "project_id": "career-pathfinder-83b14",
+    "storage_bucket": "career-pathfinder-83b14.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:409823234185:android:ed614ca2f3018d21225e58",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1bOws1oi6sBqiNiFjU_12EySaJ-ep9LA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
