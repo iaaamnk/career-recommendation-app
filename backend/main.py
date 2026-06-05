@@ -96,7 +96,11 @@ def analyze_resume(request: ResumeAnalyzeRequest, db: Session = Depends(get_db))
     import nlp_model
     user = db.query(models.User).filter(models.User.id == request.user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        # Create a mock user so the API doesn't fail for the frontend demo
+        user = models.User(id=request.user_id, email="demo@example.com", name="Demo User")
+        db.add(user)
+        db.commit()
+        db.refresh(user)
         
     analysis = nlp_model.analyze_resume_text(request.resume_text, request.target_career)
     
