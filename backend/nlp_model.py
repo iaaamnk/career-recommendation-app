@@ -46,19 +46,34 @@ def analyze_resume_text(resume_text: str, target_career: str):
     else:
         ats_score = 0.0
         
-    # Generate Recommendation
+    # Generate Recommendation and Overall Analysis
     if ats_score >= 80:
         recommendation = "Excellent match! Your resume is highly tailored to this role."
+        overall_analysis = (
+            f"Based on our AI analysis, your resume is an exceptionally strong fit for a {target_career} role. "
+            f"You have successfully highlighted core competencies like {', '.join(skills_found[:3])}. "
+            "To further optimize your profile, consider adding minor missing skills or quantifying your achievements."
+        )
     elif ats_score >= 50:
         recommendation = "Good match, but you could add more relevant keywords to improve your chances."
+        overall_analysis = (
+            f"Your profile shows a solid foundation for {target_career}, demonstrating proficiency in {', '.join(skills_found[:2]) if skills_found else 'some key areas'}. "
+            f"However, to pass strict ATS filters, you should explicitly include experience with {', '.join(skills_missing[:2]) if skills_missing else 'industry standard tools'}."
+        )
     else:
         recommendation = "Low match. Try adding more keywords related to your target role to pass ATS."
+        overall_analysis = (
+            f"Currently, your resume lacks several critical keywords expected for a {target_career} position. "
+            f"ATS systems often filter out resumes missing core skills like {', '.join(skills_missing[:3]) if skills_missing else 'required technical skills'}. "
+            "Consider restructuring your bullet points to clearly reflect these technologies."
+        )
 
     return {
         "ats_score": round(ats_score, 2),
         "skills_found": skills_found,
         "skills_missing": skills_missing,
-        "recommendation": recommendation
+        "recommendation": recommendation,
+        "overall_analysis": overall_analysis
     }
 
 def generate_interview_prep(target_career: str, missing_skills: list):
@@ -76,13 +91,24 @@ def generate_interview_prep(target_career: str, missing_skills: list):
         
     if "Data" in target_career:
         questions.append("Explain the bias-variance tradeoff.")
+        roadmap_url = "https://roadmap.sh/ai-data-scientist"
     elif "Software" in target_career:
         questions.append("How would you design a scalable URL shortener?")
+        roadmap_url = "https://roadmap.sh/backend"
+    elif "UX" in target_career or "Design" in target_career:
+        questions.append("How do you balance user needs with business goals?")
+        roadmap_url = "https://roadmap.sh/ux-design"
+    elif "Cyber" in target_career or "Security" in target_career:
+        questions.append("How would you secure a newly deployed web application?")
+        roadmap_url = "https://roadmap.sh/cyber-security"
+    else:
+        roadmap_url = "https://roadmap.sh/frontend" # default fallback
 
     return {
         "interview_questions": questions,
         "tips": [
             "Use the STAR method (Situation, Task, Action, Result) for behavioral questions.",
             "Don't be afraid to ask clarifying questions before diving into technical problems."
-        ]
+        ],
+        "roadmap_url": roadmap_url
     }

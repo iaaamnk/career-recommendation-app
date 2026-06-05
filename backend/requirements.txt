@@ -10,3 +10,7 @@ python-multipart
 spacy
 nltk
 python-dotenv
+pyhive[sqlalchemy]
+thrift
+sasl
+thrift_sasl

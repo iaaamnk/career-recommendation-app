@@ -103,6 +103,7 @@ def analyze_resume(request: ResumeAnalyzeRequest, db: Session = Depends(get_db))
         db.refresh(user)
         
     analysis = nlp_model.analyze_resume_text(request.resume_text, request.target_career)
+    interview_prep = nlp_model.generate_interview_prep(request.target_career, analysis["skills_missing"])
     
     db_resume = models.Resume(
         user_id=user.id,
@@ -116,7 +117,8 @@ def analyze_resume(request: ResumeAnalyzeRequest, db: Session = Depends(get_db))
     
     return {
         "resume_id": db_resume.id,
-        "analysis": analysis
+        "analysis": analysis,
+        "interview_prep": interview_prep
     }
 
 class InterviewPrepRequest(BaseModel):
