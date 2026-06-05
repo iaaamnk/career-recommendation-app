@@ -12,5 +12,3 @@ nltk
 python-dotenv
 pyhive[sqlalchemy]
 thrift
-sasl
-thrift_sasl
