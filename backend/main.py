@@ -7,8 +7,11 @@ from database import engine, get_db, Base
 import models
 import ml_model
 
-# Create DB tables
-Base.metadata.create_all(bind=engine)
+# Create DB tables (wrapped in try-except so it doesn't crash on boot if Hive is unavailable)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not connect to database on startup: {e}")
 
 from fastapi.middleware.cors import CORSMiddleware
 
