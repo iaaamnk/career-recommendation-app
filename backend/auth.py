@@ -1,3 +1,4 @@
+import json
 import os
 import firebase_admin
 from firebase_admin import credentials, auth
@@ -12,7 +13,13 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 cred_path = os.path.join(current_dir, "serviceAccountKey.json")
 
 try:
-    cred = credentials.Certificate(cred_path)
+    if os.path.exists(cred_path):
+        cred = credentials.Certificate(cred_path)
+    elif "FIREBASE_SERVICE_ACCOUNT_KEY" in os.environ:
+        cert_dict = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT_KEY"])
+        cred = credentials.Certificate(cert_dict)
+    else:
+        raise Exception("No Firebase credentials found in serviceAccountKey.json or FIREBASE_SERVICE_ACCOUNT_KEY")
     firebase_admin.initialize_app(cred)
 except Exception as e:
     print(f"Warning: Failed to initialize Firebase Admin: {e}")
