@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+import os
+
+content = """import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
@@ -97,7 +99,7 @@ class PathFinderApp extends StatelessWidget {
             textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, letterSpacing: 1),
           ),
         ),
-        cardTheme: const CardThemeData(
+        cardTheme: const CardTheme(
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -1141,3 +1143,7 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 }
+"""
+
+with open("lib/main.dart", "w") as f:
+    f.write(content)
