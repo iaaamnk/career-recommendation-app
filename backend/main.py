@@ -116,3 +116,13 @@ def get_interview_prep(request: InterviewPrepRequest):
     import nlp_model
     prep = nlp_model.generate_interview_prep(request.target_career, request.missing_skills)
     return prep
+
+@app.get("/api/history")
+def get_user_history(db: Session = Depends(get_db), user: models.User = Depends(verify_firebase_token)):
+    assessments = db.query(models.Assessment).filter(models.Assessment.user_id == user.id).order_by(models.Assessment.created_at.desc()).all()
+    resumes = db.query(models.Resume).filter(models.Resume.user_id == user.id).order_by(models.Resume.created_at.desc()).all()
+    
+    return {
+        "assessments": assessments,
+        "resumes": resumes
+    }
