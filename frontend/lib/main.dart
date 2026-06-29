@@ -66,17 +66,17 @@ class PathFinderApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF7F5F0), // Warm off-white
+        scaffoldBackgroundColor: const Color(0xFFF4F2EF), // Warm off-white
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFE76F51), // Burnt Sienna
-          surface: const Color(0xFFF7F5F0),
-          onSurface: const Color(0xFF1A1A1A),
+          seedColor: const Color(0xFFE68C3A), // Burnt Sienna
+          surface: const Color(0xFFF4F2EF),
+          onSurface: const Color(0xFF213E60),
         ),
         textTheme: TextTheme(
-          displayLarge: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700, color: const Color(0xFF1A1A1A), letterSpacing: -1.5),
-          displayMedium: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700, color: const Color(0xFF1A1A1A), letterSpacing: -1.0),
-          headlineMedium: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A)),
-          titleLarge: GoogleFonts.inter(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A), letterSpacing: -0.5),
+          displayLarge: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700, color: const Color(0xFF213E60), letterSpacing: -1.5),
+          displayMedium: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700, color: const Color(0xFF213E60), letterSpacing: -1.0),
+          headlineMedium: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w600, color: const Color(0xFF213E60)),
+          titleLarge: GoogleFonts.inter(fontWeight: FontWeight.w600, color: const Color(0xFF213E60), letterSpacing: -0.5),
           bodyLarge: GoogleFonts.inter(color: const Color(0xFF4A4A4A), height: 1.6),
           bodyMedium: GoogleFonts.inter(color: const Color(0xFF4A4A4A), height: 1.5),
         ),
@@ -84,13 +84,13 @@ class PathFinderApp extends StatelessWidget {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(0), borderSide: BorderSide.none),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(0), borderSide: const BorderSide(color: Color(0xFF1A1A1A), width: 2)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(0), borderSide: const BorderSide(color: Color(0xFF213E60), width: 2)),
           contentPadding: const EdgeInsets.all(20),
           labelStyle: GoogleFonts.inter(color: Colors.grey[600]),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF1A1A1A),
+            backgroundColor: const Color(0xFF213E60),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -168,7 +168,13 @@ class _AuthScreenState extends State<AuthScreen> {
           if (MediaQuery.of(context).size.width > 800)
             Expanded(
               child: Container(
-                color: const Color(0xFF1A1A1A),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF213E60), Color(0xFF94B6EF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
                 padding: const EdgeInsets.all(64),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +229,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     Center(
                       child: TextButton(
                         onPressed: () => setState(() => _isLogin = !_isLogin),
-                        style: TextButton.styleFrom(foregroundColor: const Color(0xFF1A1A1A)),
+                        style: TextButton.styleFrom(foregroundColor: const Color(0xFF213E60)),
                         child: Text(_isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'),
                       ),
                     ),
@@ -257,7 +263,7 @@ class _MainLayoutState extends State<MainLayout> {
         toolbarHeight: 80,
         title: Padding(
           padding: const EdgeInsets.only(left: 24.0),
-          child: Text('PathFinder.', style: GoogleFonts.playfairDisplay(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
+          child: Text('PathFinder.', style: GoogleFonts.playfairDisplay(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF213E60))),
         ),
         actions: [
           if (MediaQuery.of(context).size.width > 600) ...[
@@ -268,7 +274,7 @@ class _MainLayoutState extends State<MainLayout> {
             _navButton('Profile', 'profile'),
           ] else ...[
             PopupMenuButton<String>(
-              icon: const Icon(Icons.menu, color: Color(0xFF1A1A1A)),
+              icon: const Icon(Icons.menu, color: Color(0xFF213E60)),
               onSelected: (val) => setState(() => currentView = val),
               itemBuilder: (context) => [
                 const PopupMenuItem(value: 'dashboard', child: Text('Dashboard')),
@@ -283,7 +289,7 @@ class _MainLayoutState extends State<MainLayout> {
             padding: const EdgeInsets.only(right: 24.0, left: 16.0),
             child: IconButton(
               onPressed: () => FirebaseAuth.instance.signOut(),
-              icon: const Icon(Icons.logout, color: Color(0xFF1A1A1A)),
+              icon: const Icon(Icons.logout, color: Color(0xFF213E60)),
               tooltip: 'Sign Out',
             ),
           ),
@@ -303,7 +309,7 @@ class _MainLayoutState extends State<MainLayout> {
       child: TextButton(
         onPressed: () => setState(() => currentView = viewId),
         style: TextButton.styleFrom(
-          foregroundColor: isSelected ? const Color(0xFFE76F51) : const Color(0xFF1A1A1A),
+          foregroundColor: isSelected ? const Color(0xFFE68C3A) : const Color(0xFF213E60),
           textStyle: GoogleFonts.inter(fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400, letterSpacing: 0.5),
         ),
         child: Text(title.toUpperCase()),
@@ -382,7 +388,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF1A1A1A)));
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF213E60)));
     final user = FirebaseAuth.instance.currentUser;
     
     return Center(
@@ -423,12 +429,12 @@ class _DashboardViewState extends State<DashboardView> {
               ..._recentActivity.map((act) => 
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  decoration: const BoxDecoration(border: Border(left: BorderSide(color: Color(0xFFE76F51), width: 4))),
+                  decoration: const BoxDecoration(border: Border(left: BorderSide(color: Color(0xFFE68C3A), width: 4))),
                   padding: const EdgeInsets.all(24),
                   color: Colors.white,
                   child: Row(
                     children: [
-                      const Icon(Icons.arrow_right_alt, color: Color(0xFF1A1A1A)),
+                      const Icon(Icons.arrow_right_alt, color: Color(0xFF213E60)),
                       const SizedBox(width: 16),
                       Expanded(child: Text(act, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
                     ],
@@ -458,7 +464,7 @@ class _MetricCard extends StatelessWidget {
         children: [
           Text(title.toUpperCase(), style: GoogleFonts.inter(color: Colors.grey[500], fontWeight: FontWeight.w600, letterSpacing: 1.5, fontSize: 12)),
           const SizedBox(height: 16),
-          Text(value, style: GoogleFonts.playfairDisplay(fontSize: 32, fontWeight: FontWeight.w700, color: const Color(0xFF1A1A1A), height: 1.1)),
+          Text(value, style: GoogleFonts.playfairDisplay(fontSize: 32, fontWeight: FontWeight.w700, color: const Color(0xFF213E60), height: 1.1)),
         ],
       ),
     );
@@ -527,16 +533,16 @@ class _AssessmentViewState extends State<AssessmentView> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-            Text(value.toInt().toString(), style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.bold)),
+            Text(value.toInt().toString(), style: const TextStyle(color: Color(0xFF213E60), fontWeight: FontWeight.bold)),
           ],
         ),
         const SizedBox(height: 8),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: const Color(0xFF1A1A1A),
+            activeTrackColor: const Color(0xFF213E60),
             inactiveTrackColor: Colors.grey[300],
-            thumbColor: const Color(0xFFE76F51),
-            overlayColor: const Color(0xFFE76F51).withValues(alpha: 0.2),
+            thumbColor: const Color(0xFFE68C3A),
+            overlayColor: const Color(0xFFE68C3A).withValues(alpha: 0.2),
           ),
           child: Slider(value: value, min: 0, max: 10, divisions: 10, onChanged: onChanged),
         ),
@@ -662,15 +668,15 @@ class _AssessmentViewState extends State<AssessmentView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('PRIMARY MATCH', style: GoogleFonts.inter(color: const Color(0xFFE76F51), fontWeight: FontWeight.w700, letterSpacing: 2, fontSize: 12)),
+                  Text('PRIMARY MATCH', style: GoogleFonts.inter(color: const Color(0xFFE68C3A), fontWeight: FontWeight.w700, letterSpacing: 2, fontSize: 12)),
                   const SizedBox(height: 16),
-                  Text(pred['Recommended_Career'], style: GoogleFonts.playfairDisplay(fontSize: 48, fontWeight: FontWeight.w700, color: const Color(0xFF1A1A1A), height: 1.1)),
+                  Text(pred['Recommended_Career'], style: GoogleFonts.playfairDisplay(fontSize: 48, fontWeight: FontWeight.w700, color: const Color(0xFF213E60), height: 1.1)),
                   const SizedBox(height: 24),
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        color: const Color(0xFF1A1A1A),
+                        color: const Color(0xFF213E60),
                         child: Text('Confidence: ${(pred['Recommendation_Score'] * 100).toStringAsFixed(1)}%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(width: 16),
@@ -692,7 +698,7 @@ class _AssessmentViewState extends State<AssessmentView> {
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Row(
                         children: [
-                          const Icon(Icons.arrow_right_alt, color: Color(0xFFE76F51)),
+                          const Icon(Icons.arrow_right_alt, color: Color(0xFFE68C3A)),
                           const SizedBox(width: 16),
                           Expanded(child: Text('${alt['career']}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500))),
                           Text('${(alt['score'] * 100).toStringAsFixed(1)}%', style: TextStyle(color: Colors.grey[500], fontSize: 18)),
@@ -707,8 +713,8 @@ class _AssessmentViewState extends State<AssessmentView> {
             Center(
               child: TextButton.icon(
                 onPressed: () => setState(() => result = null),
-                icon: const Icon(Icons.refresh, color: Color(0xFF1A1A1A)),
-                label: const Text('NEW ASSESSMENT', style: TextStyle(color: Color(0xFF1A1A1A), letterSpacing: 1, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.refresh, color: Color(0xFF213E60)),
+                label: const Text('NEW ASSESSMENT', style: TextStyle(color: Color(0xFF213E60), letterSpacing: 1, fontWeight: FontWeight.bold)),
               ),
             ).animate().fade(delay: 300.ms),
           ],
@@ -846,10 +852,10 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
                       Container(
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          border: Border.all(color: atsScore > 75 ? const Color(0xFF2A9D8F) : (atsScore > 50 ? const Color(0xFFE9C46A) : const Color(0xFFE76F51)), width: 4),
+                          border: Border.all(color: atsScore > 75 ? const Color(0xFF94B6EF) : (atsScore > 50 ? const Color(0xFFE68C3A) : Colors.red), width: 4),
                           shape: BoxShape.circle,
                         ),
-                        child: Text('${atsScore.toInt()}%', style: GoogleFonts.playfairDisplay(fontSize: 48, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
+                        child: Text('${atsScore.toInt()}%', style: GoogleFonts.playfairDisplay(fontSize: 48, fontWeight: FontWeight.bold, color: const Color(0xFF213E60))),
                       )
                     ],
                   ),
@@ -861,14 +867,14 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
                       final verified = Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('VERIFIED SKILLS', style: GoogleFonts.inter(color: const Color(0xFF2A9D8F), fontWeight: FontWeight.w700, letterSpacing: 2, fontSize: 12)),
+                          Text('VERIFIED SKILLS', style: GoogleFonts.inter(color: const Color(0xFF94B6EF), fontWeight: FontWeight.w700, letterSpacing: 2, fontSize: 12)),
                           const SizedBox(height: 24),
                           Wrap(
                             spacing: 8, runSpacing: 8,
                             children: (analysis['skills_found'] as List).map<Widget>((s) => Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              color: const Color(0xFF2A9D8F).withValues(alpha: 0.1),
-                              child: Text(s, style: const TextStyle(color: Color(0xFF2A9D8F), fontWeight: FontWeight.w600)),
+                              color: const Color(0xFF94B6EF).withValues(alpha: 0.1),
+                              child: Text(s, style: const TextStyle(color: Color(0xFF94B6EF), fontWeight: FontWeight.w600)),
                             )).toList(),
                           )
                         ],
@@ -877,14 +883,14 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
                       final missing = Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('MISSING SKILLS', style: GoogleFonts.inter(color: const Color(0xFFE76F51), fontWeight: FontWeight.w700, letterSpacing: 2, fontSize: 12)),
+                          Text('MISSING SKILLS', style: GoogleFonts.inter(color: const Color(0xFFE68C3A), fontWeight: FontWeight.w700, letterSpacing: 2, fontSize: 12)),
                           const SizedBox(height: 24),
                           Wrap(
                             spacing: 8, runSpacing: 8,
                             children: (analysis['skills_missing'] as List).map<Widget>((s) => Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              color: const Color(0xFFE76F51).withValues(alpha: 0.1),
-                              child: Text(s, style: const TextStyle(color: Color(0xFFE76F51), fontWeight: FontWeight.w600)),
+                              color: const Color(0xFFE68C3A).withValues(alpha: 0.1),
+                              child: Text(s, style: const TextStyle(color: Color(0xFFE68C3A), fontWeight: FontWeight.w600)),
                             )).toList(),
                           ),
                         ],
@@ -920,7 +926,7 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Padding(padding: EdgeInsets.only(top: 8), child: Icon(Icons.circle, size: 8, color: Color(0xFF1A1A1A))),
+                          const Padding(padding: EdgeInsets.only(top: 8), child: Icon(Icons.circle, size: 8, color: Color(0xFF213E60))),
                           const SizedBox(width: 16),
                           Expanded(child: Text(q, style: const TextStyle(fontSize: 16, height: 1.5))),
                         ],
@@ -934,11 +940,11 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
                           final url = Uri.parse(res['interview_prep']['roadmap_url']);
                           if (await canLaunchUrl(url)) await launchUrl(url);
                         },
-                        icon: const Icon(Icons.map, color: Color(0xFF1A1A1A)),
-                        label: const Text('VIEW ROADMAP', style: TextStyle(color: Color(0xFF1A1A1A), letterSpacing: 1, fontWeight: FontWeight.bold)),
+                        icon: const Icon(Icons.map, color: Color(0xFF213E60)),
+                        label: const Text('VIEW ROADMAP', style: TextStyle(color: Color(0xFF213E60), letterSpacing: 1, fontWeight: FontWeight.bold)),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-                          side: const BorderSide(color: Color(0xFF1A1A1A), width: 2),
+                          side: const BorderSide(color: Color(0xFF213E60), width: 2),
                           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                         )
                       ),
@@ -952,8 +958,8 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
             Center(
               child: TextButton.icon(
                 onPressed: () => setState(() => result = null),
-                icon: const Icon(Icons.refresh, color: Color(0xFF1A1A1A)),
-                label: const Text('NEW SCAN', style: TextStyle(color: Color(0xFF1A1A1A), letterSpacing: 1, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.refresh, color: Color(0xFF213E60)),
+                label: const Text('NEW SCAN', style: TextStyle(color: Color(0xFF213E60), letterSpacing: 1, fontWeight: FontWeight.bold)),
               ),
             ).animate().fade(delay: 300.ms),
           ],
@@ -1007,7 +1013,7 @@ class _HistoryViewState extends State<HistoryView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF1A1A1A)));
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF213E60)));
     
     return Center(
       child: Container(
@@ -1031,7 +1037,7 @@ class _HistoryViewState extends State<HistoryView> {
                 color: Colors.white,
                 child: Row(
                   children: [
-                    Container(padding: const EdgeInsets.all(16), color: const Color(0xFFF7F5F0), child: const Icon(Icons.psychology, color: Color(0xFF1A1A1A))),
+                    Container(padding: const EdgeInsets.all(16), color: const Color(0xFFF4F2EF), child: const Icon(Icons.psychology, color: Color(0xFF213E60))),
                     const SizedBox(width: 24),
                     Expanded(
                       child: Column(
@@ -1060,7 +1066,7 @@ class _HistoryViewState extends State<HistoryView> {
                 color: Colors.white,
                 child: Row(
                   children: [
-                    Container(padding: const EdgeInsets.all(16), color: const Color(0xFFF7F5F0), child: const Icon(Icons.document_scanner, color: Color(0xFF1A1A1A))),
+                    Container(padding: const EdgeInsets.all(16), color: const Color(0xFFF4F2EF), child: const Icon(Icons.document_scanner, color: Color(0xFF213E60))),
                     const SizedBox(width: 24),
                     Expanded(
                       child: Column(
