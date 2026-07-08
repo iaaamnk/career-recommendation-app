@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -338,6 +339,7 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   bool _isLoading = true;
+  String? _errorMessage;
   int _assessmentsTaken = 0;
   String _topRecommendation = 'None';
   String _atsScore = 'N/A';
@@ -350,6 +352,8 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Future<void> _fetchDashboardData() async {
+    if (!mounted) return;
+    setState(() { _isLoading = true; _errorMessage = null; });
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     final token = await user.getIdToken();
@@ -357,7 +361,7 @@ class _DashboardViewState extends State<DashboardView> {
       final response = await http.get(
         Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/history'),
         headers: {'Authorization': 'Bearer $token'},
-      );
+      ).timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final assessments = data['assessments'] as List;
@@ -380,15 +384,41 @@ class _DashboardViewState extends State<DashboardView> {
             _isLoading = false;
           });
         }
+      } else {
+        if (mounted) setState(() { _isLoading = false; _errorMessage = 'Server returned ${response.statusCode}. The backend may be starting up — please retry in a moment.'; });
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() { _isLoading = false; _errorMessage = 'Could not connect to server. The backend may be waking up — please retry in a moment.'; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF213E60)));
+    if (_isLoading) return const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: Color(0xFF213E60)), SizedBox(height: 16), Text('Loading dashboard...', style: TextStyle(color: Color(0xFF4A4A4A)))]));
+    if (_errorMessage != null) {
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(48),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off, size: 64, color: Color(0xFFE68C3A)),
+              const SizedBox(height: 24),
+              Text('Connection Issue', style: GoogleFonts.playfairDisplay(fontSize: 28, fontWeight: FontWeight.w700, color: const Color(0xFF213E60))),
+              const SizedBox(height: 16),
+              Text(_errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF4A4A4A), fontSize: 16, height: 1.5)),
+              const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: _fetchDashboardData,
+                icon: const Icon(Icons.refresh),
+                label: const Text('RETRY'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final user = FirebaseAuth.instance.currentUser;
     
     return Center(
@@ -978,6 +1008,7 @@ class HistoryView extends StatefulWidget {
 
 class _HistoryViewState extends State<HistoryView> {
   bool _isLoading = true;
+  String? _errorMessage;
   List<dynamic> _assessments = [];
   List<dynamic> _resumes = [];
 
@@ -988,6 +1019,8 @@ class _HistoryViewState extends State<HistoryView> {
   }
 
   Future<void> _fetchHistory() async {
+    if (!mounted) return;
+    setState(() { _isLoading = true; _errorMessage = null; });
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     final token = await user.getIdToken();
@@ -995,7 +1028,7 @@ class _HistoryViewState extends State<HistoryView> {
       final response = await http.get(
         Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/history'),
         headers: {'Authorization': 'Bearer $token'},
-      );
+      ).timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (mounted) {
@@ -1005,15 +1038,41 @@ class _HistoryViewState extends State<HistoryView> {
             _isLoading = false;
           });
         }
+      } else {
+        if (mounted) setState(() { _isLoading = false; _errorMessage = 'Server returned ${response.statusCode}. The backend may be starting up — please retry in a moment.'; });
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() { _isLoading = false; _errorMessage = 'Could not connect to server. The backend may be waking up — please retry in a moment.'; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF213E60)));
+    if (_isLoading) return const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: Color(0xFF213E60)), SizedBox(height: 16), Text('Loading history...', style: TextStyle(color: Color(0xFF4A4A4A)))]));
+    if (_errorMessage != null) {
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(48),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off, size: 64, color: Color(0xFFE68C3A)),
+              const SizedBox(height: 24),
+              Text('Connection Issue', style: GoogleFonts.playfairDisplay(fontSize: 28, fontWeight: FontWeight.w700, color: const Color(0xFF213E60))),
+              const SizedBox(height: 16),
+              Text(_errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF4A4A4A), fontSize: 16, height: 1.5)),
+              const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: _fetchHistory,
+                icon: const Icon(Icons.refresh),
+                label: const Text('RETRY'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     
     return Center(
       child: Container(

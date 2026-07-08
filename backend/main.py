@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
+from datetime import datetime
 
 from database import engine, get_db, Base
 import models
@@ -117,7 +118,28 @@ def get_interview_prep(request: InterviewPrepRequest):
     prep = nlp_model.generate_interview_prep(request.target_career, request.missing_skills)
     return prep
 
-@app.get("/api/history")
+class AssessmentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    recommended_career: Optional[str] = None
+    recommendation_score: Optional[float] = None
+    unsupervised_cluster: Optional[int] = None
+    unsupervised_career: Optional[str] = None
+    top_alternatives: Optional[list] = None
+    created_at: Optional[datetime] = None
+
+class ResumeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    ats_score: Optional[float] = None
+    skill_gap_analysis: Optional[dict] = None
+    created_at: Optional[datetime] = None
+
+class HistoryResponse(BaseModel):
+    assessments: List[AssessmentOut]
+    resumes: List[ResumeOut]
+
+@app.get("/api/history", response_model=HistoryResponse)
 def get_user_history(db: Session = Depends(get_db), user: models.User = Depends(verify_firebase_token)):
     assessments = db.query(models.Assessment).filter(models.Assessment.user_id == user.id).order_by(models.Assessment.created_at.desc()).all()
     resumes = db.query(models.Resume).filter(models.Resume.user_id == user.id).order_by(models.Resume.created_at.desc()).all()
