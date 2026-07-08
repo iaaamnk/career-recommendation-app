@@ -7,3 +7,5 @@ pandas
 numpy
 firebase-admin
 python-dotenv
+psycopg2-binary
+nltk

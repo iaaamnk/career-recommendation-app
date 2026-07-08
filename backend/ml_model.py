@@ -5,7 +5,8 @@ import os
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MultiLabelBinarizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
 
 # ---------------- CONFIG ----------------
 RANDOM_SEED = 42
@@ -148,7 +149,18 @@ def load_and_train_model():
     X_values = X.values
     y = target_le.fit_transform(df['Recommended_Career'])
 
-    # Train Random Forest
+    # --- Accuracy Evaluation (80/20 split) ---
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_values, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y
+    )
+    eval_model = RandomForestClassifier(n_estimators=300, random_state=RANDOM_SEED, class_weight='balanced')
+    eval_model.fit(X_train, y_train)
+    y_pred = eval_model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Evaluation Accuracy (80/20 split): {accuracy * 100:.2f}%")
+    print(f"Dataset size: {len(df)} records")
+
+    # --- Train final production model on full dataset ---
     rf_model = RandomForestClassifier(n_estimators=300, random_state=RANDOM_SEED, class_weight='balanced')
     rf_model.fit(X_values, y)
 
@@ -166,6 +178,8 @@ def load_and_train_model():
         else:
             cluster_career_map[c] = "Unknown"
 
+    sil_score = silhouette_score(X_values, clusters)
+    print(f"Silhouette Score: {sil_score:.4f}")
     print("Model trained successfully.")
     return True
 

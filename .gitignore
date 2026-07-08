@@ -1,28 +1,28 @@
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyc
 
 # Virtual environment
 venv/
 .venv/
 env/
 
-# Environment variables (NEVER commit this)
+# Environment variables
 .env
 *.env
 
-# Jupyter checkpoints
+# Database (local SQLite)
+*.db
+
+# Jupyter
 .ipynb_checkpoints/
-
-# Utility/debug scripts (not part of the app)
-fix_css.py
-fix_js.py
-reproduce_issue.py
-
-# Flask session
-flask_session/
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# IDE
+.vscode/
+.idea/
