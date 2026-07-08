@@ -1,6 +1,7 @@
-django
-djangorestframework
-django-cors-headers
+fastapi
+uvicorn
+sqlalchemy
+pydantic
 scikit-learn
 pandas
 numpy
