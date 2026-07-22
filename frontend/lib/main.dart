@@ -254,6 +254,8 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   String currentView = 'dashboard';
+  // Keys to force widget rebuild on navigation, so data is re-fetched
+  final Map<String, UniqueKey> _viewKeys = {};
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +278,10 @@ class _MainLayoutState extends State<MainLayout> {
           ] else ...[
             PopupMenuButton<String>(
               icon: const Icon(Icons.menu, color: Color(0xFF213E60)),
-              onSelected: (val) => setState(() => currentView = val),
+              onSelected: (val) => setState(() {
+                currentView = val;
+                _viewKeys[val] = UniqueKey();
+              }),
               itemBuilder: (context) => [
                 const PopupMenuItem(value: 'dashboard', child: Text('Dashboard')),
                 const PopupMenuItem(value: 'assessment', child: Text('Assessment')),
@@ -308,7 +313,11 @@ class _MainLayoutState extends State<MainLayout> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: TextButton(
-        onPressed: () => setState(() => currentView = viewId),
+        onPressed: () => setState(() {
+          currentView = viewId;
+          // Force rebuild of the target view so it re-fetches data
+          _viewKeys[viewId] = UniqueKey();
+        }),
         style: TextButton.styleFrom(
           foregroundColor: isSelected ? const Color(0xFFE68C3A) : const Color(0xFF213E60),
           textStyle: GoogleFonts.inter(fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400, letterSpacing: 0.5),
@@ -320,12 +329,12 @@ class _MainLayoutState extends State<MainLayout> {
 
   Widget _getView() {
     switch (currentView) {
-      case 'dashboard': return const DashboardView(key: ValueKey('dash'));
+      case 'dashboard': return DashboardView(key: _viewKeys['dashboard'] ?? const ValueKey('dash'));
       case 'assessment': return const AssessmentView(key: ValueKey('assess'));
       case 'resume': return const ResumeAnalysisView(key: ValueKey('resume'));
-      case 'history': return const HistoryView(key: ValueKey('history'));
+      case 'history': return HistoryView(key: _viewKeys['history'] ?? const ValueKey('history'));
       case 'profile': return const ProfileView(key: ValueKey('profile'));
-      default: return const DashboardView(key: ValueKey('dash'));
+      default: return DashboardView(key: _viewKeys['dashboard'] ?? const ValueKey('dash'));
     }
   }
 }
@@ -351,17 +360,18 @@ class _DashboardViewState extends State<DashboardView> {
     _fetchDashboardData();
   }
 
-  Future<void> _fetchDashboardData() async {
+  Future<void> _fetchDashboardData({int retryCount = 0}) async {
     if (!mounted) return;
     setState(() { _isLoading = true; _errorMessage = null; });
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     final token = await user.getIdToken();
+    const maxRetries = 3;
     try {
       final response = await http.get(
         Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/history'),
         headers: {'Authorization': 'Bearer $token'},
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 60));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final assessments = data['assessments'] as List;
@@ -385,9 +395,19 @@ class _DashboardViewState extends State<DashboardView> {
           });
         }
       } else {
+        // Auto-retry on server errors (backend waking up)
+        if (retryCount < maxRetries && response.statusCode >= 500) {
+          await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
+          if (mounted) return _fetchDashboardData(retryCount: retryCount + 1);
+        }
         if (mounted) setState(() { _isLoading = false; _errorMessage = 'Server returned ${response.statusCode}. The backend may be starting up — please retry in a moment.'; });
       }
     } catch (e) {
+      // Auto-retry on connection/timeout errors (backend cold-starting)
+      if (retryCount < maxRetries) {
+        await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
+        if (mounted) return _fetchDashboardData(retryCount: retryCount + 1);
+      }
       if (mounted) setState(() { _isLoading = false; _errorMessage = 'Could not connect to server. The backend may be waking up — please retry in a moment.'; });
     }
   }
@@ -1018,17 +1038,18 @@ class _HistoryViewState extends State<HistoryView> {
     _fetchHistory();
   }
 
-  Future<void> _fetchHistory() async {
+  Future<void> _fetchHistory({int retryCount = 0}) async {
     if (!mounted) return;
     setState(() { _isLoading = true; _errorMessage = null; });
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     final token = await user.getIdToken();
+    const maxRetries = 3;
     try {
       final response = await http.get(
         Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/history'),
         headers: {'Authorization': 'Bearer $token'},
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 60));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (mounted) {
@@ -1039,9 +1060,17 @@ class _HistoryViewState extends State<HistoryView> {
           });
         }
       } else {
+        if (retryCount < maxRetries && response.statusCode >= 500) {
+          await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
+          if (mounted) return _fetchHistory(retryCount: retryCount + 1);
+        }
         if (mounted) setState(() { _isLoading = false; _errorMessage = 'Server returned ${response.statusCode}. The backend may be starting up — please retry in a moment.'; });
       }
     } catch (e) {
+      if (retryCount < maxRetries) {
+        await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
+        if (mounted) return _fetchHistory(retryCount: retryCount + 1);
+      }
       if (mounted) setState(() { _isLoading = false; _errorMessage = 'Could not connect to server. The backend may be waking up — please retry in a moment.'; });
     }
   }
