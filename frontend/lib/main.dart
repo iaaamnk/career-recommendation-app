@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -10,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'firebase_options.dart';
+
+const String _apiBase = 'https://career-recommendation-app-2-08ny.onrender.com';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,38 +23,29 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return FirebaseAuth.instance.authStateChanges();
 });
 
-// ---------------- STATE PROVIDERS ----------------
-class DashboardData {
-  final int assessmentsTaken;
-  final String topRecommendation;
-  final int atsScore;
-  final List<String> recentActivity;
-  DashboardData({this.assessmentsTaken=0, this.topRecommendation='None', this.atsScore=0, this.recentActivity=const []});
-}
+/// Fetches an API endpoint with automatic retry and exponential backoff.
+/// Returns decoded JSON on success, null on failure.
+Future<Map<String, dynamic>?> _fetchApi(String path, {int maxRetries = 3}) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return null;
+  final token = await user.getIdToken();
 
-class DashboardNotifier extends Notifier<DashboardData> {
-  @override
-  DashboardData build() => DashboardData();
+  for (int attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      final response = await http.get(
+        Uri.parse('$_apiBase$path'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 60));
 
-  void updateAssessment(String recommendation) {
-    state = DashboardData(
-      assessmentsTaken: state.assessmentsTaken + 1,
-      topRecommendation: recommendation,
-      atsScore: state.atsScore,
-      recentActivity: ['Completed Assessment', ...state.recentActivity],
-    );
+      if (response.statusCode == 200) return jsonDecode(response.body);
+      if (response.statusCode < 500 || attempt == maxRetries) return null;
+    } catch (_) {
+      if (attempt == maxRetries) return null;
+    }
+    await Future.delayed(Duration(seconds: (attempt + 1) * 3));
   }
-
-  void updateAtsScore(int score) {
-    state = DashboardData(
-      assessmentsTaken: state.assessmentsTaken,
-      topRecommendation: state.topRecommendation,
-      atsScore: score,
-      recentActivity: ['Completed ATS Scan: $score%', ...state.recentActivity],
-    );
-  }
+  return null;
 }
-final dashboardProvider = NotifierProvider<DashboardNotifier, DashboardData>(DashboardNotifier.new);
 
 // ---------------- MAIN APP WIDGET ----------------
 class PathFinderApp extends StatelessWidget {
@@ -355,55 +346,23 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   void initState() {
     super.initState();
-    _fetchDashboardData();
+    _loadDashboard();
   }
 
-  Future<void> _fetchDashboardData({int retryCount = 0}) async {
-    if (!mounted) return;
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-    final token = await user.getIdToken();
-    const maxRetries = 3;
-    try {
-      final response = await http.get(
-        Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/history'),
-        headers: {'Authorization': 'Bearer $token'},
-      ).timeout(const Duration(seconds: 60));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final assessments = data['assessments'] as List;
-        final resumes = data['resumes'] as List;
-        
-        int assessmentsCount = assessments.length;
-        String topRec = assessmentsCount > 0 ? assessments[0]['recommended_career'] ?? 'None' : 'None';
-        String ats = resumes.isNotEmpty ? '${resumes[0]['ats_score']}%' : 'N/A';
-
-        List<String> activity = [];
-        if (assessments.isNotEmpty) activity.add('Assessment: ${assessments[0]['recommended_career']}');
-        if (resumes.isNotEmpty) activity.add('ATS Scan: ${resumes[0]['ats_score']}%');
-
-        if (mounted) {
-          setState(() {
-            _assessmentsTaken = assessmentsCount;
-            _topRecommendation = topRec;
-            _atsScore = ats;
-            _recentActivity = activity;
-          });
-        }
-      } else {
-        // Auto-retry on server errors (backend waking up)
-        if (retryCount < maxRetries && response.statusCode >= 500) {
-          await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
-          if (mounted) return _fetchDashboardData(retryCount: retryCount + 1);
-        }
-      }
-    } catch (e) {
-      // Auto-retry on connection/timeout errors (backend cold-starting)
-      if (retryCount < maxRetries) {
-        await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
-        if (mounted) return _fetchDashboardData(retryCount: retryCount + 1);
-      }
-    }
+  Future<void> _loadDashboard() async {
+    final data = await _fetchApi('/api/history');
+    if (data == null || !mounted) return;
+    final assessments = data['assessments'] as List;
+    final resumes = data['resumes'] as List;
+    setState(() {
+      _assessmentsTaken = assessments.length;
+      _topRecommendation = assessments.isNotEmpty ? assessments[0]['recommended_career'] ?? 'None' : 'None';
+      _atsScore = resumes.isNotEmpty ? '${resumes[0]['ats_score']}%' : 'N/A';
+      _recentActivity = [
+        if (assessments.isNotEmpty) 'Assessment: ${assessments[0]['recommended_career']}',
+        if (resumes.isNotEmpty) 'ATS Scan: ${resumes[0]['ats_score']}%',
+      ];
+    });
   }
 
   @override
@@ -521,7 +480,7 @@ class _AssessmentViewState extends State<AssessmentView> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/recommend'),
+        Uri.parse('$_apiBase/api/recommend'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
         body: jsonEncode({
           "age": int.tryParse(_ageController.text) ?? 24,
@@ -770,7 +729,7 @@ class _ResumeAnalysisViewState extends State<ResumeAnalysisView> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/resume/analyze'),
+        Uri.parse('$_apiBase/api/resume/analyze'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
         body: jsonEncode({"resume_text": _resumeController.text, "target_career": _targetCareerController.text}),
       );
@@ -1002,40 +961,16 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   void initState() {
     super.initState();
-    _fetchHistory();
+    _loadHistory();
   }
 
-  Future<void> _fetchHistory({int retryCount = 0}) async {
-    if (!mounted) return;
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-    final token = await user.getIdToken();
-    const maxRetries = 3;
-    try {
-      final response = await http.get(
-        Uri.parse('https://career-recommendation-app-2-08ny.onrender.com/api/history'),
-        headers: {'Authorization': 'Bearer $token'},
-      ).timeout(const Duration(seconds: 60));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (mounted) {
-          setState(() {
-            _assessments = data['assessments'];
-            _resumes = data['resumes'];
-          });
-        }
-      } else {
-        if (retryCount < maxRetries && response.statusCode >= 500) {
-          await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
-          if (mounted) return _fetchHistory(retryCount: retryCount + 1);
-        }
-      }
-    } catch (e) {
-      if (retryCount < maxRetries) {
-        await Future.delayed(Duration(seconds: (retryCount + 1) * 3));
-        if (mounted) return _fetchHistory(retryCount: retryCount + 1);
-      }
-    }
+  Future<void> _loadHistory() async {
+    final data = await _fetchApi('/api/history');
+    if (data == null || !mounted) return;
+    setState(() {
+      _assessments = data['assessments'];
+      _resumes = data['resumes'];
+    });
   }
 
   @override
