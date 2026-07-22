@@ -6,7 +6,10 @@ gunicorn
 scikit-learn
 pandas
 numpy
-firebase-admin
 python-dotenv
 psycopg2-binary
 nltk
+supabase
+pyjwt[crypto]
+
+

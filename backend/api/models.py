@@ -1,6 +1,7 @@
 from django.db import models
 
 class User(models.Model):
+    supabase_uid = models.CharField(max_length=255, unique=True, null=True, blank=True, db_index=True)
     firebase_uid = models.CharField(max_length=255, unique=True, null=True, blank=True, db_index=True)
     email = models.EmailField(unique=True, db_index=True)
     name = models.CharField(max_length=255, null=True, blank=True)
