@@ -1,7 +1,8 @@
-fastapi
-uvicorn
-sqlalchemy
-pydantic
+django
+djangorestframework
+django-cors-headers
+dj-database-url
+gunicorn
 scikit-learn
 pandas
 numpy
