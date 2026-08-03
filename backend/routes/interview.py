@@ -4,7 +4,7 @@ from utils.error_handlers import ValidationError, APIError
 
 interview_bp = Blueprint('interview', __name__)
 
-@interview_bp.route('/api/interview/prep', methods=['POST'])
+@interview_bp.route('/api/interview/prep', methods=['POST'], strict_slashes=False)
 def get_interview_prep():
     data = request.get_json() or {}
     target_career = data.get("target_career", "")

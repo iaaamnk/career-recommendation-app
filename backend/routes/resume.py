@@ -7,7 +7,7 @@ from utils.error_handlers import ValidationError, APIError
 
 resume_bp = Blueprint('resume', __name__)
 
-@resume_bp.route('/api/resume/analyze', methods=['POST'])
+@resume_bp.route('/api/resume/analyze', methods=['POST'], strict_slashes=False)
 @require_auth
 def analyze_resume():
     user = g.user

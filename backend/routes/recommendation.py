@@ -7,7 +7,7 @@ from utils.error_handlers import ValidationError, APIError
 
 recommendation_bp = Blueprint('recommendation', __name__)
 
-@recommendation_bp.route('/api/recommend', methods=['POST'])
+@recommendation_bp.route('/api/recommend', methods=['POST'], strict_slashes=False)
 @require_auth
 def recommend_career():
     user = g.user
