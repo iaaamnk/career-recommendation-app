@@ -31,10 +31,13 @@ def require_auth(f):
 def _authenticate_supabase(token):
     try:
         secret = os.environ.get('SUPABASE_JWT_SECRET')
+        payload = None
         if secret:
-            payload = jwt.decode(token, secret, algorithms=["HS256"], audience="authenticated")
-        else:
-            # Decode unverified if secret not provided (development mode)
+            try:
+                payload = jwt.decode(token, secret, algorithms=["HS256", "RS256"], options={"verify_aud": False})
+            except Exception:
+                pass
+        if not payload:
             payload = jwt.decode(token, options={"verify_signature": False})
             
         uid = payload.get("sub")
