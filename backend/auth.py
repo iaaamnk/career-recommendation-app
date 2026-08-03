@@ -2,8 +2,6 @@ import os
 import jwt
 from functools import wraps
 from flask import request, jsonify, g
-from extensions import db
-from models import User
 
 def require_auth(f):
     @wraps(f)
@@ -48,33 +46,13 @@ def _authenticate_supabase(token):
         user_metadata = payload.get("user_metadata") or {}
         name = user_metadata.get("name") or user_metadata.get("full_name") or (email.split("@")[0] if email else "")
         
-        user = User.query.filter_by(supabase_uid=uid).first()
-        if not user and email:
-            user = User.query.filter_by(email=email).first()
-            
-        if user:
-            updated = False
-            if not user.supabase_uid:
-                user.supabase_uid = uid
-                updated = True
-            if email and user.email != email:
-                user.email = email
-                updated = True
-            if name and user.name != name:
-                user.name = name
-                updated = True
-            if updated:
-                db.session.commit()
-        else:
-            user = User(
-                supabase_uid=uid,
-                email=email or f"{uid}@supabase.local",
-                name=name
-            )
-            db.session.add(user)
-            db.session.commit()
-            
-        return user
+        return {
+            "id": uid,
+            "supabase_uid": uid,
+            "email": email,
+            "name": name
+        }
     except Exception as e:
         print(f"Supabase auth error: {e}")
         return None
+

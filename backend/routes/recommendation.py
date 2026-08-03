@@ -1,6 +1,5 @@
+import uuid
 from flask import Blueprint, request, jsonify, g
-from extensions import db
-from models import Assessment
 from auth import require_auth
 from services.ml_service import ml_service
 from utils.error_handlers import ValidationError, APIError
@@ -33,24 +32,10 @@ def recommend_career():
     except Exception as e:
         raise APIError(f"Prediction error: {str(e)}", status_code=500)
 
-    assessment = Assessment(
-        user_id=user.id,
-        age=age,
-        education=education,
-        skills=skills,
-        interests=interests,
-        riasec_scores=riasec_scores,
-        recommended_career=prediction["Recommended_Career"],
-        recommendation_score=prediction["Recommendation_Score"],
-        unsupervised_cluster=prediction["Unsupervised_Cluster"],
-        unsupervised_career=prediction["Unsupervised_Recommendation"],
-        top_alternatives=prediction["Top_3_Careers"]
-    )
-
-    db.session.add(assessment)
-    db.session.commit()
+    assessment_id = str(uuid.uuid4())
 
     return jsonify({
-        "assessment_id": assessment.id,
+        "assessment_id": assessment_id,
         "prediction": prediction
     }), 200
+

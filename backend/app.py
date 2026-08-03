@@ -2,7 +2,7 @@ import os
 from flask import Flask
 
 from config import config_by_name
-from extensions import db, cors
+from extensions import cors
 from utils.error_handlers import register_error_handlers
 from services.ml_service import ml_service
 from routes import (
@@ -25,7 +25,6 @@ def create_app(config_name=None, config_override=None):
         app.config.update(config_override)
 
     # Initialize extensions
-    db.init_app(app)
     cors.init_app(app)
 
     # Register error handlers
@@ -37,10 +36,6 @@ def create_app(config_name=None, config_override=None):
     app.register_blueprint(resume_bp)
     app.register_blueprint(interview_bp)
     app.register_blueprint(history_bp)
-
-    # Create database tables
-    with app.app_context():
-        db.create_all()
 
     # Train/load ML service
     try:

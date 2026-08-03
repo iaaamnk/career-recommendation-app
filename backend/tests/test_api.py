@@ -6,33 +6,19 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app
-from extensions import db
-from models import User
 
 class TestFlaskAPI(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_name='testing')
         self.client = self.app.test_client()
 
-        with self.app.app_context():
-            db.create_all()
-            self.test_user = User(
-                supabase_uid="test-user-uid-123",
-                email="testuser@example.com",
-                name="Test User"
-            )
-            db.session.add(self.test_user)
-            db.session.commit()
-
-            import jwt
-            self.auth_headers = {
-                "Authorization": f"Bearer {jwt.encode({'sub': 'test-user-uid-123', 'email': 'testuser@example.com'}, 'secret', algorithm='HS256')}"
-            }
+        import jwt
+        self.auth_headers = {
+            "Authorization": f"Bearer {jwt.encode({'sub': 'test-user-uid-123', 'email': 'testuser@example.com'}, 'secret', algorithm='HS256')}"
+        }
 
     def tearDown(self):
-        with self.app.app_context():
-            db.session.remove()
-            db.drop_all()
+        pass
 
     def test_health_check(self):
         response = self.client.get('/health')

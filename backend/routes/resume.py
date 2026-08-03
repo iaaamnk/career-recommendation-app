@@ -1,6 +1,5 @@
+import uuid
 from flask import Blueprint, request, jsonify, g
-from extensions import db
-from models import Resume
 from auth import require_auth
 from services.nlp_service import nlp_service
 from utils.error_handlers import ValidationError, APIError
@@ -25,18 +24,11 @@ def analyze_resume():
     except Exception as e:
         raise APIError(f"Analysis error: {str(e)}", status_code=500)
 
-    resume = Resume(
-        user_id=user.id,
-        file_path="simulated_path.pdf",
-        ats_score=analysis["ats_score"],
-        skill_gap_analysis={"missing": analysis["skills_missing"], "found": analysis["skills_found"]}
-    )
-
-    db.session.add(resume)
-    db.session.commit()
+    resume_id = str(uuid.uuid4())
 
     return jsonify({
-        "resume_id": resume.id,
+        "resume_id": resume_id,
         "analysis": analysis,
         "interview_prep": interview_prep
     }), 200
+
