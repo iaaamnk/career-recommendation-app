@@ -1,1 +1,0 @@
-# Django api app package.

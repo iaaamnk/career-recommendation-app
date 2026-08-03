@@ -1,2 +1,6 @@
-venv/\n__pycache__/\n*.db\n*.sqlite3
+venv/
+__pycache__/
+*.db
+*.sqlite3
 serviceAccountKey.json
+.env
