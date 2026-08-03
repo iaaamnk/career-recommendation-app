@@ -26,3 +26,8 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Cheatsheet & Logs
+INTERVIEW_CHEAT_SHEET.md
+*.log
+
