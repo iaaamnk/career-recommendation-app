@@ -1,9 +1,5 @@
 import os
-import json
 from flask import Flask
-
-import firebase_admin
-from firebase_admin import credentials
 
 from config import config_by_name
 from extensions import db, cors
@@ -42,26 +38,9 @@ def create_app(config_name=None, config_override=None):
     app.register_blueprint(interview_bp)
     app.register_blueprint(history_bp)
 
-    # Create tables
+    # Create database tables
     with app.app_context():
         db.create_all()
-
-    # Initialize Firebase Admin
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    cred_path = os.path.join(base_dir, "serviceAccountKey.json")
-    try:
-        if not firebase_admin._apps:
-            if os.path.exists(cred_path):
-                cred = credentials.Certificate(cred_path)
-                firebase_admin.initialize_app(cred)
-            elif "FIREBASE_SERVICE_ACCOUNT_KEY" in os.environ:
-                cert_dict = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT_KEY"])
-                cred = credentials.Certificate(cert_dict)
-                firebase_admin.initialize_app(cred)
-            else:
-                print("Warning: No Firebase credentials found in serviceAccountKey.json or FIREBASE_SERVICE_ACCOUNT_KEY")
-    except Exception as e:
-        print(f"Warning: Failed to initialize Firebase Admin: {e}")
 
     # Train/load ML service
     try:

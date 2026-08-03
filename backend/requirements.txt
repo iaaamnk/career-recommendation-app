@@ -11,4 +11,3 @@ psycopg2-binary
 nltk
 supabase
 pyjwt[crypto]
-firebase-admin

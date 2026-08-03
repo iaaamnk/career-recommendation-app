@@ -18,35 +18,15 @@ def require_auth(f):
             
         token = parts[1]
         
-        # Try Supabase Auth first, then Firebase Auth, then Dev/Demo fallback
+        # Verify Supabase Auth Token
         user = _authenticate_supabase(token)
         if not user:
-            user = _authenticate_firebase(token)
-        if not user:
-            user = _authenticate_demo(token)
-            
-        if not user:
-            return jsonify({"detail": "Invalid or expired authentication token."}), 401
+            return jsonify({"detail": "Invalid or expired Supabase authentication token."}), 401
             
         g.user = user
         return f(*args, **kwargs)
         
     return decorated
-
-def _authenticate_demo(token):
-    try:
-        user = User.query.filter_by(email="demo@pathfinder.ai").first()
-        if not user:
-            user = User(
-                supabase_uid="demo-user-uid-123",
-                email="demo@pathfinder.ai",
-                name="Demo User"
-            )
-            db.session.add(user)
-            db.session.commit()
-        return user
-    except Exception:
-        return None
 
 def _authenticate_supabase(token):
     try:
@@ -54,6 +34,7 @@ def _authenticate_supabase(token):
         if secret:
             payload = jwt.decode(token, secret, algorithms=["HS256"], audience="authenticated")
         else:
+            # Decode unverified if secret not provided (development mode)
             payload = jwt.decode(token, options={"verify_signature": False})
             
         uid = payload.get("sub")
@@ -64,9 +45,7 @@ def _authenticate_supabase(token):
         user_metadata = payload.get("user_metadata") or {}
         name = user_metadata.get("name") or user_metadata.get("full_name") or (email.split("@")[0] if email else "")
         
-        user = None
-        if uid:
-            user = User.query.filter_by(supabase_uid=uid).first()
+        user = User.query.filter_by(supabase_uid=uid).first()
         if not user and email:
             user = User.query.filter_by(email=email).first()
             
@@ -94,40 +73,5 @@ def _authenticate_supabase(token):
             
         return user
     except Exception as e:
-        return None
-
-def _authenticate_firebase(token):
-    try:
-        from firebase_admin import auth as firebase_auth
-        decoded_token = firebase_auth.verify_id_token(token)
-        uid = decoded_token.get("uid")
-        if not uid:
-            return None
-            
-        email = decoded_token.get("email", "")
-        name = decoded_token.get("name", "")
-        
-        user = User.query.filter_by(firebase_uid=uid).first()
-        if not user and email:
-            user = User.query.filter_by(email=email).first()
-            
-        if user:
-            if not user.firebase_uid:
-                user.firebase_uid = uid
-            if email and user.email != email:
-                user.email = email
-            if name and user.name != name:
-                user.name = name
-            db.session.commit()
-        else:
-            user = User(
-                firebase_uid=uid,
-                email=email or f"{uid}@firebase.local",
-                name=name
-            )
-            db.session.add(user)
-            db.session.commit()
-            
-        return user
-    except Exception as e:
+        print(f"Supabase auth error: {e}")
         return None

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../../domain/models/user_model.dart';
 
 class AuthRepository {
@@ -16,7 +15,7 @@ class AuthRepository {
     _controller.add(_demoUser);
   }
 
-  /// Stream of user authentication state changes
+  /// Stream of Supabase user authentication state changes
   Stream<AppUser?> get authStateChanges {
     try {
       return Supabase.instance.client.auth.onAuthStateChange.map((data) {
@@ -29,22 +28,11 @@ class AuthRepository {
         );
       });
     } catch (_) {
-      try {
-        return fb.FirebaseAuth.instance.authStateChanges().map((user) {
-          if (user == null) return _demoUser;
-          return AppUser.fromSupabaseOrFirebase(
-            id: user.uid,
-            email: user.email,
-            name: user.displayName,
-          );
-        });
-      } catch (_) {
-        return _controller.stream;
-      }
+      return _controller.stream;
     }
   }
 
-  /// Current logged-in user
+  /// Current logged-in Supabase user
   AppUser? get currentUser {
     try {
       final sbUser = Supabase.instance.client.auth.currentUser;
@@ -57,65 +45,40 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    try {
-      final fbUser = fb.FirebaseAuth.instance.currentUser;
-      if (fbUser != null) {
-        return AppUser.fromSupabaseOrFirebase(
-          id: fbUser.uid,
-          email: fbUser.email,
-          name: fbUser.displayName,
-        );
-      }
-    } catch (_) {}
-
     return _demoUser;
   }
 
-  /// Sign in user
+  /// Sign in user with Supabase
   Future<void> signIn({required String email, required String password}) async {
     try {
       await Supabase.instance.client.auth.signInWithPassword(
         email: email,
         password: password,
       );
-    } catch (sbErr) {
-      try {
-        await fb.FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      } catch (_) {
-        _demoUser = AppUser(
-          id: 'demo-${email.hashCode}',
-          email: email.isNotEmpty ? email : 'guest@pathfinder.ai',
-          name: email.isNotEmpty ? email.split('@')[0] : 'Guest User',
-        );
-        _controller.add(_demoUser);
-      }
+    } catch (_) {
+      _demoUser = AppUser(
+        id: 'demo-${email.hashCode}',
+        email: email.isNotEmpty ? email : 'guest@pathfinder.ai',
+        name: email.isNotEmpty ? email.split('@')[0] : 'Guest User',
+      );
+      _controller.add(_demoUser);
     }
   }
 
-  /// Sign up user
+  /// Sign up user with Supabase
   Future<void> signUp({required String email, required String password}) async {
     try {
       await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
       );
-    } catch (sbErr) {
-      try {
-        await fb.FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      } catch (_) {
-        _demoUser = AppUser(
-          id: 'demo-${email.hashCode}',
-          email: email.isNotEmpty ? email : 'guest@pathfinder.ai',
-          name: email.isNotEmpty ? email.split('@')[0] : 'Guest User',
-        );
-        _controller.add(_demoUser);
-      }
+    } catch (_) {
+      _demoUser = AppUser(
+        id: 'demo-${email.hashCode}',
+        email: email.isNotEmpty ? email : 'guest@pathfinder.ai',
+        name: email.isNotEmpty ? email.split('@')[0] : 'Guest User',
+      );
+      _controller.add(_demoUser);
     }
   }
 
@@ -129,15 +92,12 @@ class AuthRepository {
     _controller.add(_demoUser);
   }
 
-  /// Sign out user
+  /// Sign out user from Supabase
   Future<void> signOut() async {
     _demoUser = null;
     _controller.add(null);
     try {
       await Supabase.instance.client.auth.signOut();
-    } catch (_) {}
-    try {
-      await fb.FirebaseAuth.instance.signOut();
     } catch (_) {}
   }
 }

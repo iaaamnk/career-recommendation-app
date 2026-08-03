@@ -9,7 +9,6 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     supabase_uid = db.Column(db.String(255), unique=True, nullable=True, index=True)
-    firebase_uid = db.Column(db.String(255), unique=True, nullable=True, index=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     name = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=_utc_now)
@@ -21,7 +20,6 @@ class User(db.Model):
         return {
             "id": self.id,
             "supabase_uid": self.supabase_uid,
-            "firebase_uid": self.firebase_uid,
             "email": self.email,
             "name": self.name,
             "created_at": self.created_at.isoformat() if self.created_at else None
