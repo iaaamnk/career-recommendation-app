@@ -199,12 +199,12 @@ class DashboardScreen extends ConsumerWidget {
                           (act) => Container(
                             margin: const EdgeInsets.only(bottom: 16),
                             decoration: const BoxDecoration(
+                              color: Colors.white,
                               border: Border(
                                 left: BorderSide(color: AppTheme.burntSienna, width: 4),
                               ),
                             ),
                             padding: const EdgeInsets.all(24),
-                            color: Colors.white,
                             child: Row(
                               children: [
                                 const Icon(Icons.arrow_right_alt, color: AppTheme.primaryNavy),
