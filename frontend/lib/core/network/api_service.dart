@@ -45,9 +45,14 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception("Server returned ${response.statusCode}: ${response.body}");
       }
     } catch (e) {
       debugPrint('GET primary URL error: $e. Attempting localhost fallback...');
+      if (e.toString().contains('Server returned')) {
+        throw e;
+      }
     }
 
     if (!primaryUrl.contains('127.0.0.1') && !primaryUrl.contains('localhost')) {
@@ -86,9 +91,16 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception("Server returned ${response.statusCode}: ${response.body}");
       }
     } catch (e) {
       debugPrint('POST primary URL error: $e');
+      // If it's a server error from our primary URL, throw it immediately 
+      // rather than trying localhost fallback which masks the real error.
+      if (e.toString().contains('Server returned')) {
+        throw e;
+      }
     }
 
     if (!primaryUrl.contains('127.0.0.1') && !primaryUrl.contains('localhost')) {
