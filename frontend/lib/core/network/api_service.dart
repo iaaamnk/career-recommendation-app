@@ -41,7 +41,7 @@ class ApiService {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
@@ -49,29 +49,9 @@ class ApiService {
         throw Exception("Server returned ${response.statusCode}: ${response.body}");
       }
     } catch (e) {
-      debugPrint('GET primary URL error: $e. Attempting localhost fallback...');
-      if (e.toString().contains('Server returned')) {
-        throw e;
-      }
+      debugPrint('GET error: $e');
+      throw Exception("Request failed: $e");
     }
-
-    if (!primaryUrl.contains('127.0.0.1') && !primaryUrl.contains('localhost')) {
-      try {
-        final response = await _client.get(
-          Uri.parse('http://127.0.0.1:5000$path'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ).timeout(const Duration(seconds: 4));
-
-        if (response.statusCode == 200) {
-          return jsonDecode(response.body) as Map<String, dynamic>;
-        }
-      } catch (_) {}
-    }
-
-    throw Exception("Network request failed for $path");
   }
 
   /// Performs POST request with auth headers & intelligent offline fallback
@@ -87,7 +67,7 @@ class ApiService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
@@ -95,31 +75,8 @@ class ApiService {
         throw Exception("Server returned ${response.statusCode}: ${response.body}");
       }
     } catch (e) {
-      debugPrint('POST primary URL error: $e');
-      // If it's a server error from our primary URL, throw it immediately 
-      // rather than trying localhost fallback which masks the real error.
-      if (e.toString().contains('Server returned')) {
-        throw e;
-      }
+      debugPrint('POST error: $e');
+      throw Exception("Request failed: $e");
     }
-
-    if (!primaryUrl.contains('127.0.0.1') && !primaryUrl.contains('localhost')) {
-      try {
-        final response = await _client.post(
-          Uri.parse('http://127.0.0.1:5000$path'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(body),
-        ).timeout(const Duration(seconds: 5));
-
-        if (response.statusCode == 200) {
-          return jsonDecode(response.body) as Map<String, dynamic>;
-        }
-      } catch (_) {}
-    }
-
-    throw Exception("Network request failed for $path");
   }
 }
