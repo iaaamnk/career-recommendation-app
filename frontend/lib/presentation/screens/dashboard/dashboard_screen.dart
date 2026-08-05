@@ -30,9 +30,18 @@ class DashboardScreen extends ConsumerWidget {
                   .fade()
                   .slideY(begin: 0.1),
               const SizedBox(height: 16),
-              Text(
-                'Welcome back, $userName. Here is your trajectory.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                  children: [
+                    const TextSpan(text: 'Welcome back, '),
+                    TextSpan(
+                      text: userName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(text: '. Here is your trajectory.'),
+                  ],
+                ),
               ).animate().fade(delay: 100.ms).slideY(begin: 0.1),
               const SizedBox(height: 48),
 

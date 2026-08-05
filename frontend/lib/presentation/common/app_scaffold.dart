@@ -37,10 +37,7 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
       body: SafeArea(
         child: Row(
           children: [
-            if (!isDesktop && _isCollapsed) 
-              const SizedBox.shrink()
-            else
-              _buildSideBar(),
+            _buildSideBar(),
             Expanded(
               child: Scaffold(
                 appBar: AppBar(
@@ -95,48 +92,51 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
   }
 
   Widget _buildSideBar() {
-    final user = ref.read(authStateProvider).value;
-    final name = user?.name ?? 'User Account';
-    final email = user?.email ?? '';
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
-      width: _isCollapsed ? 80 : 280,
+      width: _isCollapsed ? 0 : 80,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(right: BorderSide(color: Colors.grey[200]!)),
       ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            color: AppTheme.primaryNavy,
-            width: double.infinity,
-            child: Column(
-              children: [
-                const CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 24,
-                  child: Icon(Icons.person, color: AppTheme.primaryNavy, size: 30),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        child: SizedBox(
+          width: 80,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                color: AppTheme.primaryNavy,
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 24,
+                      child: Icon(Icons.person, color: AppTheme.primaryNavy, size: 30),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _navTile(Icons.dashboard, 'Dashboard', '/dashboard'),
+                    _navTile(Icons.assessment, 'Assessment', '/assessment'),
+                    _navTile(Icons.document_scanner, 'ATS Scan', '/resume'),
+                    _navTile(Icons.history, 'History', '/history'),
+                    _navTile(Icons.person, 'Profile', '/profile'),
+                  ],
+                ),
+              ),
+            ],
           ),
-          if (!_isCollapsed)
-            const SizedBox(height: 16),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _navTile(Icons.dashboard, 'Dashboard', '/dashboard'),
-                _navTile(Icons.assessment, 'Assessment', '/assessment'),
-                _navTile(Icons.document_scanner, 'ATS Scan', '/resume'),
-                _navTile(Icons.history, 'History', '/history'),
-                _navTile(Icons.person, 'Profile', '/profile'),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -145,14 +145,9 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
     final isSelected = widget.currentRoute == route;
     return ListTile(
       leading: Icon(icon, color: isSelected ? AppTheme.burntSienna : AppTheme.primaryNavy),
-      title: _isCollapsed ? null : Text(
-        title,
-        style: TextStyle(
-          color: isSelected ? AppTheme.burntSienna : AppTheme.primaryNavy,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
+      title: null,
       selected: isSelected,
+      tooltip: title,
       onTap: () => _navigateTo(context, route),
     );
   }
