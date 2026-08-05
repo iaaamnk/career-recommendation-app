@@ -2,6 +2,7 @@ import uuid
 from flask import Blueprint, request, jsonify, g
 from auth import require_auth
 from services.ml_service import ml_service
+from services.db_service import db_service
 from utils.error_handlers import ValidationError, APIError
 
 recommendation_bp = Blueprint('recommendation', __name__)
@@ -33,6 +34,9 @@ def recommend_career():
         raise APIError(f"Prediction error: {str(e)}", status_code=500)
 
     assessment_id = str(uuid.uuid4())
+    
+    # Save to database
+    db_service.insert_assessment(user["id"], assessment_id, prediction)
 
     return jsonify({
         "assessment_id": assessment_id,
