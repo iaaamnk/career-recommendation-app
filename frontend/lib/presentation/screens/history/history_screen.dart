@@ -90,13 +90,16 @@ class HistoryScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            Text(
-                              a.createdAt.contains('T')
-                                  ? a.createdAt.split('T')[0]
-                                  : a.createdAt,
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontWeight: FontWeight.w500,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                a.createdAt.contains('T')
+                                    ? a.createdAt.split('T')[0]
+                                    : a.createdAt,
+                                style: TextStyle(
+                                  color: Colors.grey[400],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -153,13 +156,16 @@ class HistoryScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            Text(
-                              r.createdAt.contains('T')
-                                  ? r.createdAt.split('T')[0]
-                                  : r.createdAt,
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontWeight: FontWeight.w500,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                r.createdAt.contains('T')
+                                    ? r.createdAt.split('T')[0]
+                                    : r.createdAt,
+                                style: TextStyle(
+                                  color: Colors.grey[400],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],

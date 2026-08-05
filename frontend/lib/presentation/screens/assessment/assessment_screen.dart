@@ -270,41 +270,49 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                result.recommendedCareer,
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.primaryNavy,
-                  height: 1.1,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  result.recommendedCareer,
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 48,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primaryNavy,
+                    height: 1.1,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    color: AppTheme.primaryNavy,
-                    child: Text(
-                      'Confidence: ${(result.recommendationScore * 100).toStringAsFixed(1)}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      color: AppTheme.primaryNavy,
+                      child: Text(
+                        'Confidence: ${(result.recommendationScore * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Text(
+                        'Cluster #${result.cluster}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    child: Text(
-                      'Cluster #${result.cluster}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 48),
               const Divider(),

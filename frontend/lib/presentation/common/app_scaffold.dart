@@ -50,18 +50,6 @@ class AppScaffold extends ConsumerWidget {
             _navButton(context, 'ATS Scan', '/resume'),
             _navButton(context, 'History', '/history'),
             _navButton(context, 'Profile', '/profile'),
-          ] else ...[
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.menu, color: AppTheme.primaryNavy),
-              onSelected: (val) => _navigateTo(context, val),
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: '/dashboard', child: Text('Dashboard')),
-                const PopupMenuItem(value: '/assessment', child: Text('Assessment / Quiz')),
-                const PopupMenuItem(value: '/resume', child: Text('ATS Scan')),
-                const PopupMenuItem(value: '/history', child: Text('History')),
-                const PopupMenuItem(value: '/profile', child: Text('Profile')),
-              ],
-            ),
           ],
           Padding(
             padding: const EdgeInsets.only(right: 24.0, left: 16.0),
@@ -79,6 +67,7 @@ class AppScaffold extends ConsumerWidget {
           ),
         ],
       ),
+      drawer: isDesktop ? null : _buildDrawer(context, ref),
       body: SafeArea(child: body),
     );
   }
@@ -97,6 +86,110 @@ class AppScaffold extends ConsumerWidget {
           ),
         ),
         child: Text(title.toUpperCase()),
+      ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context, WidgetRef ref) {
+    final user = ref.read(authStateProvider).value;
+    final name = user?.name ?? 'User Account';
+    final email = user?.email ?? '';
+
+    return Drawer(
+      child: Column(
+        children: [
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: AppTheme.primaryNavy),
+            currentAccountPicture: const CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: AppTheme.primaryNavy, size: 40),
+            ),
+            accountName: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+            accountEmail: Text(email),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Profile details:', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                const SizedBox(height: 8),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text('Age:'), Text('24', style: TextStyle(fontWeight: FontWeight.bold))],
+                ),
+                const SizedBox(height: 4),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text('Skills:'), Text('Python, SQL', style: TextStyle(fontWeight: FontWeight.bold))],
+                ),
+                const SizedBox(height: 4),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text('Interests:'), Text('Data, Analysis', style: TextStyle(fontWeight: FontWeight.bold))],
+                ),
+                const SizedBox(height: 4),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text('RIASEC:'), Text('R:5 I:5 A:5 S:5 E:5 C:5', style: TextStyle(fontWeight: FontWeight.bold))],
+                ),
+              ],
+            ),
+          ),
+          const Divider(),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.dashboard),
+                  title: const Text('Dashboard'),
+                  selected: currentRoute == '/dashboard',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateTo(context, '/dashboard');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.assessment),
+                  title: const Text('Assessment / Quiz'),
+                  selected: currentRoute == '/assessment',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateTo(context, '/assessment');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.document_scanner),
+                  title: const Text('ATS Scan'),
+                  selected: currentRoute == '/resume',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateTo(context, '/resume');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: const Text('History'),
+                  selected: currentRoute == '/history',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateTo(context, '/history');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.person),
+                  title: const Text('Profile'),
+                  selected: currentRoute == '/profile',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateTo(context, '/profile');
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
