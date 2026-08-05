@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
 
 class ApiConstants {
   static String get baseUrl {
-    if (kDebugMode || kIsWeb) {
+    if (kDebugMode) {
+      if (!kIsWeb && Platform.isAndroid) {
+        return 'http://10.0.2.2:5000';
+      }
       return 'http://127.0.0.1:5000';
     }
     return 'https://career-recommendation-app-2-08ny.onrender.com';
