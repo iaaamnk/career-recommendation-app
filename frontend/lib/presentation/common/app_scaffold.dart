@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
+import '../providers/assessment_provider.dart';
+import '../providers/history_provider.dart';
+import '../providers/resume_provider.dart';
 import '../../core/theme/app_theme.dart';
 
 class AppScaffold extends ConsumerStatefulWidget {
@@ -66,6 +69,12 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
                         onPressed: () async {
                           final authRepo = ref.read(authRepositoryProvider);
                           await authRepo.signOut();
+                          
+                          // Clear cached user data
+                          ref.invalidate(historyFutureProvider);
+                          ref.invalidate(assessmentProvider);
+                          ref.invalidate(resumeProvider);
+
                           if (context.mounted) {
                             Navigator.of(context).pushReplacementNamed('/auth');
                           }
