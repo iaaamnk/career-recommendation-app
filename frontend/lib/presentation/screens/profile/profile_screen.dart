@@ -115,6 +115,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       keyboardType: TextInputType.emailAddress,
                       enabled: false,
                     ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      initialValue: '24',
+                      decoration: const InputDecoration(labelText: 'Age'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      initialValue: 'Python, SQL',
+                      decoration: const InputDecoration(labelText: 'Skills'),
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      initialValue: 'Data, Analysis',
+                      decoration: const InputDecoration(labelText: 'Interests'),
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      initialValue: 'R:5 I:5 A:5 S:5 E:5 C:5',
+                      decoration: const InputDecoration(labelText: 'RIASEC Score'),
+                    ),
                     const SizedBox(height: 48),
                     FilledButton(
                       onPressed: () {

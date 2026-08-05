@@ -90,8 +90,7 @@ class HistoryScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
+                            Flexible(
                               child: Text(
                                 a.createdAt.contains('T')
                                     ? a.createdAt.split('T')[0]
@@ -100,6 +99,7 @@ class HistoryScreen extends ConsumerWidget {
                                   color: Colors.grey[400],
                                   fontWeight: FontWeight.w500,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -156,8 +156,7 @@ class HistoryScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
+                            Flexible(
                               child: Text(
                                 r.createdAt.contains('T')
                                     ? r.createdAt.split('T')[0]
@@ -166,6 +165,7 @@ class HistoryScreen extends ConsumerWidget {
                                   color: Colors.grey[400],
                                   fontWeight: FontWeight.w500,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
