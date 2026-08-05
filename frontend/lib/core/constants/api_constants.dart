@@ -3,12 +3,7 @@ import 'dart:io' show Platform;
 
 class ApiConstants {
   static String get baseUrl {
-    if (kDebugMode) {
-      if (!kIsWeb && Platform.isAndroid) {
-        return 'http://10.0.2.2:5000';
-      }
-      return 'http://127.0.0.1:5000';
-    }
+    // Returning production URL by default since local backend isn't running
     return 'https://career-recommendation-app-2-08ny.onrender.com';
   }
 
