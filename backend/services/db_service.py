@@ -7,18 +7,29 @@ class DBService:
         self.supabase_key = os.environ.get("SUPABASE_ANON_KEY")
         self.client: Client = None
         
+        # In-memory storage for demo user
+        self.demo_assessments = []
+        self.demo_resumes = []
+        
         if self.supabase_url and self.supabase_key:
             self.client = create_client(self.supabase_url, self.supabase_key)
             
     def insert_assessment(self, user_id: str, assessment_id: str, prediction: dict):
-        if not self.client:
-            return None
-        
         data = {
             "id": assessment_id,
             "user_id": user_id,
             "prediction_data": prediction,
         }
+        
+        if user_id == "demo-user-id":
+            import datetime
+            data["created_at"] = datetime.datetime.utcnow().isoformat()
+            self.demo_assessments.insert(0, data)
+            return [data]
+            
+        if not self.client:
+            return None
+            
         try:
             response = self.client.table("assessments").insert(data).execute()
             return response.data
@@ -27,15 +38,22 @@ class DBService:
             return None
             
     def insert_resume_analysis(self, user_id: str, resume_id: str, analysis: dict, interview_prep: dict):
-        if not self.client:
-            return None
-            
         data = {
             "id": resume_id,
             "user_id": user_id,
             "analysis_data": analysis,
             "interview_prep": interview_prep,
         }
+        
+        if user_id == "demo-user-id":
+            import datetime
+            data["created_at"] = datetime.datetime.utcnow().isoformat()
+            self.demo_resumes.insert(0, data)
+            return [data]
+            
+        if not self.client:
+            return None
+            
         try:
             response = self.client.table("resume_analyses").insert(data).execute()
             return response.data
@@ -44,6 +62,12 @@ class DBService:
             return None
             
     def get_user_history(self, user_id: str):
+        if user_id == "demo-user-id":
+            return {
+                "assessments": self.demo_assessments,
+                "resumes": self.demo_resumes
+            }
+            
         if not self.client:
             return {"assessments": [], "resumes": []}
             
