@@ -10,9 +10,10 @@ class AssessmentHistoryItem {
   });
 
   factory AssessmentHistoryItem.fromJson(Map<String, dynamic> json) {
+    final predictionData = json['prediction_data'] as Map<String, dynamic>? ?? {};
     return AssessmentHistoryItem(
-      recommendedCareer: json['recommended_career'] as String? ?? 'Unknown',
-      recommendationScore: (json['recommendation_score'] as num?)?.toDouble() ?? 0.0,
+      recommendedCareer: predictionData['Recommended_Career'] as String? ?? 'Unknown',
+      recommendationScore: (predictionData['Recommendation_Score'] as num?)?.toDouble() ?? 0.0,
       createdAt: json['created_at'] as String? ?? '',
     );
   }
@@ -28,8 +29,9 @@ class ResumeHistoryItem {
   });
 
   factory ResumeHistoryItem.fromJson(Map<String, dynamic> json) {
+    final analysisData = json['analysis_data'] as Map<String, dynamic>? ?? {};
     return ResumeHistoryItem(
-      atsScore: (json['ats_score'] as num?)?.toInt() ?? 0,
+      atsScore: (analysisData['ats_score'] as num?)?.toInt() ?? 0,
       createdAt: json['created_at'] as String? ?? '',
     );
   }
