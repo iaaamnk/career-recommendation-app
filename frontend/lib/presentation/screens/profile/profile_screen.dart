@@ -17,25 +17,68 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
+  late TextEditingController _ageController;
+  late TextEditingController _skillsController;
+  late TextEditingController _interestsController;
+  late TextEditingController _riasecController;
+
+  bool _isPopulatedFromHistory = false;
 
   @override
   void initState() {
     super.initState();
-    final user = ref.read(authStateProvider).value;
-    _nameController = TextEditingController(text: user?.name ?? '');
-    _emailController = TextEditingController(text: user?.email ?? '');
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _ageController = TextEditingController();
+    _skillsController = TextEditingController();
+    _interestsController = TextEditingController();
+    _riasecController = TextEditingController();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _ageController.dispose();
+    _skillsController.dispose();
+    _interestsController.dispose();
+    _riasecController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(authStateProvider).value;
+    if (user != null) {
+      if (_nameController.text.isEmpty && user.name.isNotEmpty) {
+        _nameController.text = user.name;
+      }
+      if (_emailController.text.isEmpty && user.email.isNotEmpty) {
+        _emailController.text = user.email;
+      }
+    }
+
     final historyAsync = ref.watch(historyFutureProvider);
+
+    historyAsync.whenData((history) {
+      if (!_isPopulatedFromHistory && history != null && history.assessments.isNotEmpty) {
+        final latest = history.assessments.first;
+        if (latest.age != null && _ageController.text.isEmpty) {
+          _ageController.text = latest.age.toString();
+        }
+        if (latest.skills.isNotEmpty && _skillsController.text.isEmpty) {
+          _skillsController.text = latest.skills.join(', ');
+        }
+        if (latest.interests.isNotEmpty && _interestsController.text.isEmpty) {
+          _interestsController.text = latest.interests.join(', ');
+        }
+        if (latest.riasecScores.isNotEmpty && _riasecController.text.isEmpty) {
+          _riasecController.text = latest.riasecScores.map((s) => s.toStringAsFixed(1)).join(', ');
+        }
+        _isPopulatedFromHistory = true;
+      }
+    });
+
     final hasTakenTest = historyAsync.value?.assessments.isNotEmpty == true;
 
     return AppScaffold(
@@ -80,13 +123,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             children: [
                               Text(
                                 _nameController.text.isEmpty
-                                    ? 'User Account'
+                                    ? (user?.name ?? 'User Account')
                                     : _nameController.text,
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _emailController.text,
+                                _emailController.text.isEmpty
+                                    ? (user?.email ?? '')
+                                    : _emailController.text,
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                             ],
@@ -111,6 +156,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     TextField(
                       controller: _nameController,
                       decoration: const InputDecoration(labelText: 'Full Name'),
+                      onChanged: (val) => setState(() {}),
                     ),
                     const SizedBox(height: 24),
                     TextField(
@@ -121,21 +167,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     if (hasTakenTest) ...[
                       const SizedBox(height: 24),
-                      TextFormField(
+                      TextField(
+                        controller: _ageController,
                         decoration: const InputDecoration(labelText: 'Age'),
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 24),
-                      TextFormField(
+                      TextField(
+                        controller: _skillsController,
                         decoration: const InputDecoration(labelText: 'Skills'),
                       ),
                       const SizedBox(height: 24),
-                      TextFormField(
+                      TextField(
+                        controller: _interestsController,
                         decoration: const InputDecoration(labelText: 'Interests'),
                       ),
                       const SizedBox(height: 24),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'RIASEC Score'),
+                      TextField(
+                        controller: _riasecController,
+                        decoration: const InputDecoration(labelText: 'RIASEC Score (R, I, A, S, E, C)'),
                       ),
                     ],
                     const SizedBox(height: 48),

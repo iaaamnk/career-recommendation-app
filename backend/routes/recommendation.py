@@ -33,6 +33,14 @@ def recommend_career():
     except Exception as e:
         raise APIError(f"Prediction error: {str(e)}", status_code=500)
 
+    prediction["user_inputs"] = {
+        "age": age,
+        "education": education,
+        "skills": skills,
+        "interests": interests,
+        "riasec_scores": riasec_scores
+    }
+
     assessment_id = str(uuid.uuid4())
     
     # Save to database

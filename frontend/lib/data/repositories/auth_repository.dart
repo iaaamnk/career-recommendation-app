@@ -3,10 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/models/user_model.dart';
 
 class AuthRepository {
-  static AppUser? _sessionUser = AppUser(
+  static AppUser? _sessionUser = AppUser.fromSupabaseOrFirebase(
     id: 'user-default-1',
     email: 'user@pathfinder.ai',
-    name: 'Candidate',
   );
 
   final StreamController<AppUser?> _controller = StreamController<AppUser?>.broadcast();
@@ -66,10 +65,9 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    _sessionUser = AppUser(
+    _sessionUser = AppUser.fromSupabaseOrFirebase(
       id: 'user-${email.hashCode}',
       email: email.isNotEmpty ? email : 'user@pathfinder.ai',
-      name: email.isNotEmpty ? email.split('@')[0] : 'Candidate',
     );
     _controller.add(_sessionUser);
   }
@@ -92,20 +90,18 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    _sessionUser = AppUser(
+    _sessionUser = AppUser.fromSupabaseOrFirebase(
       id: 'user-${email.hashCode}',
       email: email.isNotEmpty ? email : 'user@pathfinder.ai',
-      name: email.isNotEmpty ? email.split('@')[0] : 'Candidate',
     );
     _controller.add(_sessionUser);
   }
 
   /// Sign out user from Supabase
   Future<void> signOut() async {
-    _sessionUser = AppUser(
+    _sessionUser = AppUser.fromSupabaseOrFirebase(
       id: 'user-${DateTime.now().millisecondsSinceEpoch}',
       email: 'user@pathfinder.ai',
-      name: 'Candidate',
     );
     _controller.add(_sessionUser);
     try {
