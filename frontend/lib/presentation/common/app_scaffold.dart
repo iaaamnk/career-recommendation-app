@@ -31,8 +31,6 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 700;
-
     return Scaffold(
       body: SafeArea(
         child: Row(

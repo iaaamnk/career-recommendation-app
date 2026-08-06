@@ -98,5 +98,38 @@ class TestFlaskAPI(unittest.TestCase):
         self.assertIn("assessments", data)
         self.assertIn("resumes", data)
 
+    def test_user_history_isolation(self):
+        import jwt
+        token_a = jwt.encode({'sub': 'user-a-uid-123', 'email': 'usera@example.com'}, 'secret', algorithm='HS256')
+        token_b = jwt.encode({'sub': 'user-b-uid-456', 'email': 'userb@example.com'}, 'secret', algorithm='HS256')
+        headers_user_a = {"Authorization": f"Bearer {token_a}"}
+        headers_user_b = {"Authorization": f"Bearer {token_b}"}
+
+        # User A performs resume analysis
+        res_a = self.client.post(
+            '/api/resume/analyze',
+            data=json.dumps({
+                "resume_text": "User A Python developer resume",
+                "target_career": "Software Engineer"
+            }),
+            content_type='application/json',
+            headers=headers_user_a
+        )
+        self.assertEqual(res_a.status_code, 200)
+
+        # User B fetches history
+        hist_b = self.client.get('/api/history', headers=headers_user_b)
+        self.assertEqual(hist_b.status_code, 200)
+        data_b = json.loads(hist_b.data)
+        # User B should NOT see User A's resume analysis
+        self.assertEqual(len(data_b["resumes"]), 0)
+
+        # User A fetches history
+        hist_a = self.client.get('/api/history', headers=headers_user_a)
+        self.assertEqual(hist_a.status_code, 200)
+        data_a = json.loads(hist_a.data)
+        # User A SHOULD see User A's resume analysis
+        self.assertEqual(len(data_a["resumes"]), 1)
+
 if __name__ == '__main__':
     unittest.main()

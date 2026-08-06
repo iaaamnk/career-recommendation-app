@@ -16,16 +16,6 @@ def require_auth(f):
             
         token = parts[1]
         
-        # Handle demo token fallback
-        if token == 'demo-bearer-token-123':
-            g.user = {
-                "id": "demo-user-id",
-                "supabase_uid": "demo-user-id",
-                "email": "demo@example.com",
-                "name": "Demo User"
-            }
-            return f(*args, **kwargs)
-        
         # Verify Supabase Auth Token
         user = _authenticate_supabase(token)
         if not user:

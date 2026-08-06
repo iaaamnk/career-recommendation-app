@@ -159,30 +159,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             : Text(_isLogin ? 'SIGN IN' : 'CREATE ACCOUNT'),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          await ref.read(authRepositoryProvider).signInAsGuest();
-                          if (context.mounted) {
-                            Navigator.of(context).pushReplacementNamed('/dashboard');
-                          }
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: AppTheme.primaryNavy),
-                        ),
-                        child: Text(
-                          'EXPLORE IN DEMO MODE',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                            color: AppTheme.primaryNavy,
-                          ),
-                        ),
-                      ),
-                    ),
                     const SizedBox(height: 24),
                     Center(
                       child: TextButton(

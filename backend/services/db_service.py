@@ -34,7 +34,7 @@ class DBService:
                 print(f"Error inserting assessment to Supabase: {e}")
         
         # Fallback to in-memory if DB fails or doesn't exist
-        if not success or user_id == "demo-user-id":
+        if not success:
             if user_id not in self.memory_assessments:
                 self.memory_assessments[user_id] = []
             self.memory_assessments[user_id].insert(0, data)
@@ -61,7 +61,7 @@ class DBService:
                 print(f"Error inserting resume analysis to Supabase: {e}")
                 
         # Fallback to in-memory if DB fails or doesn't exist
-        if not success or user_id == "demo-user-id":
+        if not success:
             if user_id not in self.memory_resumes:
                 self.memory_resumes[user_id] = []
             self.memory_resumes[user_id].insert(0, data)
@@ -72,24 +72,24 @@ class DBService:
         assessments = []
         resumes = []
         
-        if self.client and user_id != "demo-user-id":
+        if self.client:
             try:
                 a_res = self.client.table("assessments").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
-                assessments = a_res.data
+                assessments = a_res.data or []
             except Exception as e:
                 print(f"Error fetching assessments from Supabase: {e}")
                 
             try:
                 r_res = self.client.table("resume_analyses").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
-                resumes = r_res.data
+                resumes = r_res.data or []
             except Exception as e:
                 print(f"Error fetching resume analyses from Supabase: {e}")
                 
-        # Merge with any in-memory fallback data for this session
+        # Merge with any in-memory fallback data for this user
         mem_assessments = self.memory_assessments.get(user_id, [])
         mem_resumes = self.memory_resumes.get(user_id, [])
         
-        # Avoid duplicates if it somehow succeeded in DB but also went to memory (e.g. demo user)
+        # Avoid duplicates if it somehow succeeded in DB but also went to memory
         db_a_ids = {a['id'] for a in assessments}
         db_r_ids = {r['id'] for r in resumes}
         

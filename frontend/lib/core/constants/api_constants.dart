@@ -1,6 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'dart:io' show Platform;
-
 class ApiConstants {
   static String get baseUrl {
     // Returning production URL by default since local backend isn't running

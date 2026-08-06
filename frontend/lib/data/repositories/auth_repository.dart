@@ -3,16 +3,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/models/user_model.dart';
 
 class AuthRepository {
-  static AppUser? _demoUser = AppUser(
-    id: 'demo-user-123',
-    email: 'demo@pathfinder.ai',
-    name: 'Demo Candidate',
-  );
-
   final StreamController<AppUser?> _controller = StreamController<AppUser?>.broadcast();
 
   AuthRepository() {
-    _controller.add(_demoUser);
+    _controller.add(currentUser);
   }
 
   /// Stream of Supabase user authentication state changes
@@ -20,7 +14,7 @@ class AuthRepository {
     try {
       return Supabase.instance.client.auth.onAuthStateChange.map((data) {
         final user = data.session?.user;
-        if (user == null) return _demoUser;
+        if (user == null) return null;
         return AppUser.fromSupabaseOrFirebase(
           id: user.id,
           email: user.email,
@@ -45,56 +39,41 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    return _demoUser;
+    return null;
   }
 
   /// Sign in user with Supabase
   Future<void> signIn({required String email, required String password}) async {
-    try {
-      await Supabase.instance.client.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-    } catch (_) {
-      _demoUser = AppUser(
-        id: 'demo-${email.hashCode}',
-        email: email.isNotEmpty ? email : 'guest@pathfinder.ai',
-        name: email.isNotEmpty ? email.split('@')[0] : 'Guest User',
-      );
-      _controller.add(_demoUser);
+    final response = await Supabase.instance.client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    if (response.user != null) {
+      _controller.add(AppUser.fromSupabaseOrFirebase(
+        id: response.user!.id,
+        email: response.user!.email,
+        metadata: response.user!.userMetadata,
+      ));
     }
   }
 
   /// Sign up user with Supabase
   Future<void> signUp({required String email, required String password}) async {
-    try {
-      await Supabase.instance.client.auth.signUp(
-        email: email,
-        password: password,
-      );
-    } catch (_) {
-      _demoUser = AppUser(
-        id: 'demo-${email.hashCode}',
-        email: email.isNotEmpty ? email : 'guest@pathfinder.ai',
-        name: email.isNotEmpty ? email.split('@')[0] : 'Guest User',
-      );
-      _controller.add(_demoUser);
-    }
-  }
-
-  /// Demo / Guest mode sign in
-  Future<void> signInAsGuest() async {
-    _demoUser = AppUser(
-      id: 'demo-guest-user',
-      email: 'guest@pathfinder.ai',
-      name: 'Guest Candidate',
+    final response = await Supabase.instance.client.auth.signUp(
+      email: email,
+      password: password,
     );
-    _controller.add(_demoUser);
+    if (response.user != null) {
+      _controller.add(AppUser.fromSupabaseOrFirebase(
+        id: response.user!.id,
+        email: response.user!.email,
+        metadata: response.user!.userMetadata,
+      ));
+    }
   }
 
   /// Sign out user from Supabase
   Future<void> signOut() async {
-    _demoUser = null;
     _controller.add(null);
     try {
       await Supabase.instance.client.auth.signOut();

@@ -11,7 +11,7 @@ class ApiService {
 
   ApiService({http.Client? client}) : _client = client ?? http.Client();
 
-  /// Retrieves active auth token from Supabase, Firebase, or Demo token
+  /// Retrieves active auth token from Supabase or Firebase
   Future<String> _getAuthToken() async {
     try {
       final token = Supabase.instance.client.auth.currentSession?.accessToken;
@@ -26,7 +26,7 @@ class ApiService {
       }
     } catch (_) {}
 
-    return 'demo-bearer-token-123';
+    throw Exception("Authentication required. Please sign in.");
   }
 
   /// Performs GET request with fallback
