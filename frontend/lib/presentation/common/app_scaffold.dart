@@ -22,7 +22,7 @@ class AppScaffold extends ConsumerStatefulWidget {
 }
 
 class _AppScaffoldState extends ConsumerState<AppScaffold> {
-  bool _isCollapsed = false;
+  bool _isCollapsed = true;
 
   void _navigateTo(BuildContext context, String routeName) {
     if (widget.currentRoute == routeName) return;
