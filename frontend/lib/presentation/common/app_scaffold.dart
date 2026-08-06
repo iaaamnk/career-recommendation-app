@@ -143,12 +143,14 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
 
   Widget _navTile(IconData icon, String title, String route) {
     final isSelected = widget.currentRoute == route;
-    return ListTile(
-      leading: Icon(icon, color: isSelected ? AppTheme.burntSienna : AppTheme.primaryNavy),
-      title: null,
-      selected: isSelected,
-      tooltip: title,
-      onTap: () => _navigateTo(context, route),
+    return Tooltip(
+      message: title,
+      child: ListTile(
+        leading: Icon(icon, color: isSelected ? AppTheme.burntSienna : AppTheme.primaryNavy),
+        title: null,
+        selected: isSelected,
+        onTap: () => _navigateTo(context, route),
+      ),
     );
   }
 }

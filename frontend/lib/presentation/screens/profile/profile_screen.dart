@@ -36,7 +36,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final historyAsync = ref.watch(historyFutureProvider);
-    final hasTakenTest = historyAsync.valueOrNull?.assessments.isNotEmpty == true;
+    final hasTakenTest = historyAsync.value?.assessments.isNotEmpty == true;
 
     return AppScaffold(
       currentRoute: '/profile',
