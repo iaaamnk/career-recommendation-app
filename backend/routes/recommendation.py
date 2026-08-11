@@ -19,6 +19,8 @@ def recommend_career():
         skills = list(data.get("skills", []))
         interests = list(data.get("interests", []))
         riasec_scores = [float(s) for s in data.get("riasec_scores", [])]
+        while len(riasec_scores) < 6:
+            riasec_scores.append(5.0)
     except Exception as e:
         raise ValidationError(f"Invalid request data: {str(e)}")
 

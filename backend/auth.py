@@ -47,7 +47,7 @@ def _authenticate_supabase(token):
             except Exception:
                 pass
         if not payload:
-            payload = jwt.decode(token, options={"verify_signature": False})
+            payload = jwt.decode(token, options={"verify_signature": False}, algorithms=["HS256", "RS256", "ES256"])
             
         uid = payload.get("sub")
         if not uid:
