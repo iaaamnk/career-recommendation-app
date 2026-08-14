@@ -131,5 +131,45 @@ class TestFlaskAPI(unittest.TestCase):
         # User A SHOULD see User A's resume analysis
         self.assertEqual(len(data_a["resumes"]), 1)
 
+    def test_analyze_resume_file_upload(self):
+        import io
+        fake_pdf = b"%PDF-1.4 Fake PDF Content for Resume Test\nPython SQL Flask Docker Kubernetes"
+        response = self.client.post(
+            '/api/resume/analyze',
+            data={
+                'file': (io.BytesIO(fake_pdf), 'test_resume.pdf'),
+                'target_career': 'Software Engineer',
+                'resume_text': 'Python SQL Flask Docker Kubernetes engineer resume'
+            },
+            content_type='multipart/form-data',
+            headers=self.auth_headers
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertIn("resume_id", data)
+        self.assertIn("analysis", data)
+        self.assertIn("analyzed_by", data)
+
+    def test_analyze_resume_base64_json(self):
+        import base64
+        fake_pdf_b64 = base64.b64encode(b"%PDF-1.4 Fake PDF Content\nPython Data Science SQL").decode('utf-8')
+        payload = {
+            "file_data": fake_pdf_b64,
+            "mime_type": "application/pdf",
+            "resume_text": "Python Data Science SQL machine learning developer",
+            "target_career": "Data Scientist"
+        }
+        response = self.client.post(
+            '/api/resume/analyze',
+            data=json.dumps(payload),
+            content_type='application/json',
+            headers=self.auth_headers
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertIn("resume_id", data)
+        self.assertIn("analysis", data)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -39,8 +39,12 @@ class ResumeNotifier extends Notifier<ResumeState> {
   }
 
   Future<bool> analyzeResume({
-    required String resumeText,
+    String? resumeText,
     required String targetCareer,
+    List<int>? fileBytes,
+    String? fileName,
+    String? mimeType,
+    String? geminiApiKey,
   }) async {
     final repository = ref.read(resumeRepositoryProvider);
     state = state.copyWith(isLoading: true, clearError: true);
@@ -48,6 +52,10 @@ class ResumeNotifier extends Notifier<ResumeState> {
       final res = await repository.analyzeResume(
         resumeText: resumeText,
         targetCareer: targetCareer,
+        fileBytes: fileBytes,
+        fileName: fileName,
+        mimeType: mimeType,
+        geminiApiKey: geminiApiKey,
       );
 
       if (res != null) {
@@ -56,7 +64,7 @@ class ResumeNotifier extends Notifier<ResumeState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'ATS Resume analysis failed. Please try again.',
+          errorMessage: 'Resume analysis failed. Please try again.',
         );
         return false;
       }
