@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_options.dart';
 import 'core/theme/app_theme.dart';
+import 'core/network/wake_service.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/screens/auth/auth_screen.dart';
 import 'presentation/screens/dashboard/dashboard_screen.dart';
@@ -22,6 +23,10 @@ void main() async {
   } catch (e) {
     debugPrint('Supabase initialization skipped or error: $e');
   }
+
+  // Fire-and-forget: wake the Render backend while the user views the auth screen.
+  // ignore: unawaited_futures
+  WakeService.wakeBackend();
 
   runApp(const ProviderScope(child: PathFinderApp()));
 }

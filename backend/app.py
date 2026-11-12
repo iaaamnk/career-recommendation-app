@@ -25,7 +25,11 @@ def create_app(config_name=None, config_override=None):
         app.config.update(config_override)
 
     # Initialize extensions
-    cors.init_app(app)
+    cors.init_app(app, resources={r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Gemini-API-Key"]
+    }})
 
     # Register error handlers
     register_error_handlers(app)

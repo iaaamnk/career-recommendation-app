@@ -6,6 +6,7 @@ class ApiConstants {
 
   // Endpoint paths
   static const String health = '/health';
+  static const String wake = '/wake';
   static const String recommend = '/api/recommend';
   static const String resumeAnalyze = '/api/resume/analyze';
   static const String interviewPrep = '/api/interview/prep';

@@ -11,6 +11,7 @@ def index():
         "model_loaded": ml_service.is_loaded and ml_service.rf_model is not None,
         "endpoints": {
             "health": "/health",
+            "wake": "/wake",
             "recommend": "/api/recommend",
             "resume_analyze": "/api/resume/analyze",
             "interview_prep": "/api/interview/prep",
@@ -24,3 +25,9 @@ def health_check():
         "status": "ok",
         "model_loaded": ml_service.is_loaded and ml_service.rf_model is not None
     }), 200
+
+@health_bp.route('/wake', methods=['GET'], strict_slashes=False)
+def wake():
+    """Lightweight no-auth endpoint for frontend warm-up pings.
+    Call this before the first real request to wake the Render dyno."""
+    return jsonify({"status": "awake"}), 200
